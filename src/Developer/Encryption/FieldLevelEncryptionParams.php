@@ -175,7 +175,7 @@ class FieldLevelEncryptionParams {
     /**
      * @throws EncryptionException
      */
-    private function getOrComputeEncryptionCertificateFingerprint($config) {
+    private static function getOrComputeEncryptionCertificateFingerprint($config) {
         try {
             $providedCertificateFingerprintValue = $config->encryptionCertificateFingerprint;
             if (!empty($providedCertificateFingerprintValue)) {

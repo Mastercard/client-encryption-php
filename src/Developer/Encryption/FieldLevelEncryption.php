@@ -56,7 +56,7 @@ class FieldLevelEncryption {
      * @return The updated payload
      * @throws EncryptionException
      */
-    public function decryptPayload($payload, $config, $params = null) {
+    public static function decryptPayload($payload, $config, $params = null) {
         try {
             // Parse the given payload
             $payloadJsonObject = json_decode($payload);
