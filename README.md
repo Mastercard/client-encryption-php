@@ -41,7 +41,7 @@ composer require mastercard/client-encryption
 
 ### Loading the Encryption Certificate <a name="loading-the-encryption-certificate"></a>
 
-A certificate resource can be created from a file by calling the `EncryptionUtils::loadEncryptionCertificate` method:
+A certificate resource can be created from a file by calling `EncryptionUtils::loadEncryptionCertificate`:
 ```php
 use Mastercard\Developer\Utils\EncryptionUtils;
 // ...
@@ -52,9 +52,9 @@ Supported certificate formats: PEM, DER.
 
 ### Loading the Decryption Key <a name="loading-the-decryption-key"></a>
 
-#### From a PKCS#12 File
+#### From a PKCS#12 Key Store
 
-A private key resource can be created from a PKCS#12 file by calling the `EncryptionUtils::loadDecryptionKey` method:
+A private key resource can be created from a PKCS#12 key store by calling `EncryptionUtils::loadDecryptionKey` the following way:
 ```php
 use Mastercard\Developer\Utils\EncryptionUtils;
 // ...
@@ -66,7 +66,7 @@ $decryptionKey = EncryptionUtils::loadDecryptionKey(
 
 #### From an Unencrypted Key File
 
-A private key resource can be created from an unencrypted key file by calling the `EncryptionUtils::loadDecryptionKey` method:
+A private key resource can be created from an unencrypted key file by calling `EncryptionUtils::loadDecryptionKey` the following way:
 ```php
 use Mastercard\Developer\Utils\EncryptionUtils;
 // ...
