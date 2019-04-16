@@ -639,7 +639,7 @@ class FieldLevelEncryptionTest extends TestCase {
         $this->assertFalse(property_exists($encryptedPayloadObject, 'data'));
         $encryptedData = $encryptedPayloadObject->encryptedData;
         $this->assertNotEmpty($encryptedData);
-        $this->assertEquals(1, sizeof($encryptedData)); // 'encryptedValue' only
+        $this->assertEquals(1, count((array)$encryptedData)); // 'encryptedValue' only
     }
 
     public function testDecryptPayload_Nominal() {
