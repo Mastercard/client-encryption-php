@@ -36,7 +36,7 @@ class FieldLevelEncryptionParams {
 
     /**
      * Generate encryption parameters.
-     * @param $config a FieldLevelEncryptionConfig instance
+     * @param $config A FieldLevelEncryptionConfig instance
      * @return FieldLevelEncryptionParams
      * @throws EncryptionException
      */

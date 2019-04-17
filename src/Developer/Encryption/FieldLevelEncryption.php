@@ -241,11 +241,19 @@ class FieldLevelEncryption {
     }
 
     private static function encryptBytes($key, $iv, $bytes) {
-        return openssl_encrypt($bytes, self::SYMMETRIC_CYPHER, $key, OPENSSL_RAW_DATA, $iv);
+        $encryptedBytes = openssl_encrypt($bytes, self::SYMMETRIC_CYPHER, $key, OPENSSL_RAW_DATA, $iv);
+        if (false === $encryptedBytes) {
+            throw new EncryptionException('Failed to encrypt bytes!');
+        }
+        return $encryptedBytes;
     }
 
-    private static function decryptBytes($key, $iv, $bytes) {
-        return openssl_decrypt($bytes, self::SYMMETRIC_CYPHER, $key, OPENSSL_RAW_DATA, $iv);
+    private static function decryptBytes($key, $iv, $encryptedBytes) {
+        $bytes = openssl_decrypt($encryptedBytes, self::SYMMETRIC_CYPHER, $key, OPENSSL_RAW_DATA, $iv);
+        if (false === $bytes) {
+            throw new EncryptionException('Failed to decrypt bytes with the provided key and IV!');
+        }
+        return $bytes;
     }
 
     private static function sanitizeJson($json) {
