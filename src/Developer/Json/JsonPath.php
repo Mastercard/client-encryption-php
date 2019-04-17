@@ -23,8 +23,8 @@ class JsonPath {
      * @throws \InvalidArgumentException
      */
     static function normalizePath($path) {
-        if (empty($path)) {
-            throw new \InvalidArgumentException('Empty JSON path!');
+        if (empty($path) || !is_string($path)) {
+            throw new \InvalidArgumentException('JSON path must be a non-empty string!');
         }
         if ($path === '$') {
             return $path;

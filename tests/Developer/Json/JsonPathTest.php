@@ -39,7 +39,20 @@ class JsonPathTest extends TestCase {
 
         // THEN
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Empty JSON path!');
+        $this->expectExceptionMessage('JSON path must be a non-empty string!');
+
+        // WHEN
+        JsonPath::normalizePath($jsonPath);
+    }
+
+    public function testNormalizePath_ShouldThrowInvalidArgumentException_WhenJsonPathIsNotAString() {
+
+        // GIVEN
+        $jsonPath = [];
+
+        // THEN
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('JSON path must be a non-empty string!');
 
         // WHEN
         JsonPath::normalizePath($jsonPath);
@@ -187,7 +200,7 @@ class JsonPathTest extends TestCase {
 
         // THEN
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Empty JSON path!');
+        $this->expectExceptionMessage('JSON path must be a non-empty string!');
 
         // WHEN
         JsonPath::getParentPath($jsonPath);
@@ -200,7 +213,7 @@ class JsonPathTest extends TestCase {
 
         // THEN
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Empty JSON path!');
+        $this->expectExceptionMessage('JSON path must be a non-empty string!');
 
         // WHEN
         JsonPath::getElementKey($jsonPath);
