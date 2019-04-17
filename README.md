@@ -15,6 +15,7 @@
   * [Loading the Encryption Certificate](#loading-the-encryption-certificate) 
   * [Loading the Decryption Key](#loading-the-decryption-key)
   * [Performing Field Level Encryption and Decryption](#performing-field-level-encryption-and-decryption)
+  * [Integrating with OpenAPI Generator API Client Libraries](#integrating-with-openapi-generator-api-client-libraries)
 
 ## Overview <a name="overview"></a>
 Library for Mastercard API compliant payload encryption/decryption.
@@ -382,4 +383,54 @@ Output:
     "sensitiveField1": "sensitiveValue1",
     "sensitiveField2": "sensitiveValue2"
 }
+```
+
+### Integrating with OpenAPI Generator API Client Libraries <a name="integrating-with-openapi-generator-api-client-libraries"></a>
+
+[OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) generates API client libraries from [OpenAPI Specs](https://github.com/OAI/OpenAPI-Specification). 
+It provides generators and library templates for supporting multiple languages and frameworks.
+
+This project provides you with some interceptor classes you can use when configuring your API client. 
+These classes will take care of encrypting request and decrypting response payloads, but also of updating HTTP headers when needed.
+
+Generators currently supported:
++ [php](#php)
+
+#### php <a name="php"></a>
+
+##### OpenAPI Generator
+
+Client libraries can be generated using the following command:
+```shell
+java -jar openapi-generator-cli.jar generate -i openapi-spec.yaml -g php -o out
+```
+See also: 
+* [OpenAPI Generator (executable)](https://mvnrepository.com/artifact/org.openapitools/openapi-generator-cli)
+* [CONFIG OPTIONS for php](https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/php.md)
+
+##### Usage of the `PsrHttpMessageEncryptionInterceptor`
+
+```php
+use GuzzleHttp;
+use OpenAPI\Client\Api\ServiceApi;
+use OpenAPI\Client\Configuration
+use Mastercard\Developer\Signers\PsrHttpMessageSigner;
+use Mastercard\Developer\Interceptors\PsrHttpMessageEncryptionInterceptor;
+// ...
+
+$stack = new GuzzleHttp\HandlerStack();
+$stack->setHandler(new GuzzleHttp\Handler\CurlHandler());
+$fieldLevelEncryptionConfig = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
+    // ...
+    ->build();
+$fieldLevelEncryptionInterceptor = new PsrHttpMessageEncryptionInterceptor($fieldLevelEncryptionConfig);
+$stack->push(GuzzleHttp\Middleware::mapRequest([$fieldLevelEncryptionInterceptor, 'interceptRequest']));
+$stack->push(GuzzleHttp\Middleware::mapResponse([$fieldLevelEncryptionInterceptor, 'interceptResponse']));
+$stack->push(GuzzleHttp\Middleware::mapRequest([new PsrHttpMessageSigner($consumerKey, $signingKey), 'sign']));
+$options = ['handler' => $stack];
+$client = new GuzzleHttp\Client($options);
+$config = new Configuration();
+$config->setHost('https://sandbox.api.mastercard.com');
+$serviceApi = new ServiceApi($client, $config);
+// ...
 ```
