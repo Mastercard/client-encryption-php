@@ -208,27 +208,27 @@ class FieldLevelEncryptionConfigBuilder {
         $this->computeEncryptionCertificateFingerprintWhenNeeded();
         $this->computeEncryptionKeyFingerprintWhenNeeded();
 
-        $config = new FieldLevelEncryptionConfig();
-        $config->encryptionCertificateFingerprintFieldName = $this->encryptionCertificateFingerprintFieldName;
-        $config->encryptionKeyFingerprintFieldName = $this->encryptionKeyFingerprintFieldName;
-        $config->encryptionCertificateFingerprint = $this->encryptionCertificateFingerprint;
-        $config->encryptionKeyFingerprint = $this->encryptionKeyFingerprint;
-        $config->decryptionKey = $this->decryptionKey;
-        $config->encryptionPaths = $this->encryptionPaths;
-        $config->encryptionCertificate = $this->encryptionCertificate;
-        $config->oaepPaddingDigestAlgorithm = $this->oaepPaddingDigestAlgorithm;
-        $config->ivFieldName = $this->ivFieldName;
-        $config->oaepPaddingDigestAlgorithmFieldName = $this->oaepPaddingDigestAlgorithmFieldName;
-        $config->decryptionPaths = $this->decryptionPaths;
-        $config->encryptedKeyFieldName = $this->encryptedKeyFieldName;
-        $config->fieldValueEncoding = $this->fieldValueEncoding;
-        $config->encryptedValueFieldName = $this->encryptedValueFieldName;
-        $config->ivHeaderName = $this->ivHeaderName;
-        $config->oaepPaddingDigestAlgorithmHeaderName = $this->oaepPaddingDigestAlgorithmHeaderName;
-        $config->encryptedKeyHeaderName = $this->encryptedKeyHeaderName;
-        $config->encryptionCertificateFingerprintHeaderName = $this->encryptionCertificateFingerprintHeaderName;
-        $config->encryptionKeyFingerprintHeaderName = $this->encryptionKeyFingerprintHeaderName;
-        return $config;
+        return new FieldLevelEncryptionConfig(
+            $this->encryptionCertificate,
+            $this->encryptionCertificateFingerprint,
+            $this->encryptionKeyFingerprint,
+            $this->decryptionKey,
+            $this->encryptionPaths,
+            $this->decryptionPaths,
+            $this->oaepPaddingDigestAlgorithm,
+            $this->oaepPaddingDigestAlgorithmFieldName,
+            $this->oaepPaddingDigestAlgorithmHeaderName,
+            $this->ivFieldName,
+            $this->ivHeaderName,
+            $this->encryptedKeyFieldName,
+            $this->encryptedKeyHeaderName,
+            $this->encryptedValueFieldName,
+            $this->encryptionCertificateFingerprintFieldName,
+            $this->encryptionCertificateFingerprintHeaderName,
+            $this->encryptionKeyFingerprintFieldName,
+            $this->encryptionKeyFingerprintHeaderName,
+            $this->fieldValueEncoding
+        );
     }
 
     private function checkJsonPathParameterValues() {

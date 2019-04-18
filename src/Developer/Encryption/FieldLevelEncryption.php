@@ -30,7 +30,7 @@ class FieldLevelEncryption {
             $payloadJsonObject = json_decode($payload);
 
             // Perform encryption (if needed)
-            foreach ($config->encryptionPaths as $jsonPathIn => $jsonPathOut) {
+            foreach ($config->getEncryptionPaths() as $jsonPathIn => $jsonPathOut) {
                 self::encryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params);
             }
 
@@ -61,7 +61,7 @@ class FieldLevelEncryption {
             $payloadJsonObject = json_decode($payload);
 
             // Perform decryption (if needed)
-            foreach ($config->decryptionPaths as $jsonPathIn => $jsonPathOut) {
+            foreach ($config->getDecryptionPaths() as $jsonPathIn => $jsonPathOut) {
                 self::decryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params);
             }
 
@@ -95,7 +95,7 @@ class FieldLevelEncryption {
         // Encrypt data at the given JSON path
         $inJsonString = self::sanitizeJson(json_encode($inJsonObject));
         $encryptedValueBytes = self::encryptBytes($params->getSecretKeyBytes(), $params->getIvBytes(), $inJsonString);
-        $encryptedValue = EncodingUtils::encodeBytes($encryptedValueBytes, $config->fieldValueEncoding);
+        $encryptedValue = EncodingUtils::encodeBytes($encryptedValueBytes, $config->getFieldValueEncoding());
 
         // Delete data in clear
         if ('$' !== $jsonPathIn) {
@@ -109,21 +109,21 @@ class FieldLevelEncryption {
 
         // Add encrypted data and encryption fields at the given JSON path
         $outJsonObject = self::checkOrCreateOutObject($payloadJsonObject, $jsonPathOut);
-        $outJsonObject->{$config->encryptedValueFieldName} = $encryptedValue;
-        if (!empty($config->ivFieldName)) {
-            $outJsonObject->{$config->ivFieldName} = $params->getIvValue();
+        $outJsonObject->{$config->getEncryptedValueFieldName()} = $encryptedValue;
+        if (!empty($config->getIvFieldName())) {
+            $outJsonObject->{$config->getIvFieldName()} = $params->getIvValue();
         }
-        if (!empty($config->encryptedKeyFieldName)) {
-            $outJsonObject->{$config->encryptedKeyFieldName} = $params->getEncryptedKeyValue();
+        if (!empty($config->getEncryptedKeyFieldName())) {
+            $outJsonObject->{$config->getEncryptedKeyFieldName()} = $params->getEncryptedKeyValue();
         }
-        if (!empty($config->encryptionCertificateFingerprintFieldName)) {
-            $outJsonObject->{$config->encryptionCertificateFingerprintFieldName} = $config->encryptionCertificateFingerprint;
+        if (!empty($config->getEncryptionCertificateFingerprintFieldName())) {
+            $outJsonObject->{$config->getEncryptionCertificateFingerprintFieldName()} = $config->getEncryptionCertificateFingerprint();
         }
-        if (!empty($config->encryptionKeyFingerprintFieldName)) {
-            $outJsonObject->{$config->encryptionKeyFingerprintFieldName} = $config->encryptionKeyFingerprint;
+        if (!empty($config->getEncryptionKeyFingerprintFieldName())) {
+            $outJsonObject->{$config->getEncryptionKeyFingerprintFieldName()} = $config->getEncryptionKeyFingerprint();
         }
-        if (!empty($config->oaepPaddingDigestAlgorithmFieldName)) {
-            $outJsonObject->{$config->oaepPaddingDigestAlgorithmFieldName} = $params->getOaepPaddingDigestAlgorithmValue();
+        if (!empty($config->getOaepPaddingDigestAlgorithmFieldName())) {
+            $outJsonObject->{$config->getOaepPaddingDigestAlgorithmFieldName()} = $params->getOaepPaddingDigestAlgorithmValue();
         }
     }
 
@@ -139,7 +139,7 @@ class FieldLevelEncryption {
         }
 
         // Read and remove encrypted data and encryption fields at the given JSON path
-        $encryptedValueJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->encryptedValueFieldName);
+        $encryptedValueJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->getEncryptedValueFieldName());
         if (empty($encryptedValueJsonElement)) {
             // Nothing to decrypt
             return;
@@ -151,17 +151,17 @@ class FieldLevelEncryption {
 
         if (empty($params)) {
             // Read encryption params from the payload
-            $oaepDigestAlgorithmJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->oaepPaddingDigestAlgorithmFieldName);
-            $oaepDigestAlgorithm = empty($oaepDigestAlgorithmJsonElement) ? $config->oaepPaddingDigestAlgorithm : $oaepDigestAlgorithmJsonElement;
-            $encryptedKeyJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->encryptedKeyFieldName);
-            $ivJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->ivFieldName);
-            self::readAndDeleteJsonKey($inJsonObject, $config->encryptionCertificateFingerprintFieldName);
-            self::readAndDeleteJsonKey($inJsonObject, $config->encryptionKeyFingerprintFieldName);
+            $oaepDigestAlgorithmJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->getOaepPaddingDigestAlgorithmFieldName());
+            $oaepDigestAlgorithm = empty($oaepDigestAlgorithmJsonElement) ? $config->getOaepPaddingDigestAlgorithm() : $oaepDigestAlgorithmJsonElement;
+            $encryptedKeyJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->getEncryptedKeyFieldName());
+            $ivJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->getIvFieldName());
+            self::readAndDeleteJsonKey($inJsonObject, $config->getEncryptionCertificateFingerprintFieldName());
+            self::readAndDeleteJsonKey($inJsonObject, $config->getEncryptionKeyFingerprintFieldName());
             $params = new FieldLevelEncryptionParams($config, $ivJsonElement, $encryptedKeyJsonElement, $oaepDigestAlgorithm);
         }
 
         // Decrypt data
-        $encryptedValueBytes = EncodingUtils::decodeValue($encryptedValueJsonElement, $config->fieldValueEncoding);
+        $encryptedValueBytes = EncodingUtils::decodeValue($encryptedValueJsonElement, $config->getFieldValueEncoding());
         $decryptedValueBytes = self::decryptBytes($params->getSecretKeyBytes(), $params->getIvBytes(), $encryptedValueBytes);
 
        // Add decrypted data at the given JSON path

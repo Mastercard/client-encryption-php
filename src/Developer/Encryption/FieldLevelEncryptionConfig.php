@@ -11,26 +11,26 @@ class FieldLevelEncryptionConfig {
     /**
      * A certificate object whose public key will be used for encryption.
      */
-    public $encryptionCertificate;
+    private $encryptionCertificate;
 
     /**
      * The SHA-256 hex-encoded digest of the certificate used for encryption (optional, the digest will be
      * automatically computed if this field is null or empty).
      * Example: '4d9d7540be320429ffc8e6506f054525816e2d0e95a85247d5b58be713f28be0'
      */
-    public $encryptionCertificateFingerprint;
+    private $encryptionCertificateFingerprint;
 
     /**
      * The SHA-256 hex-encoded digest of the key used for encryption (optional, the digest will be
      * automatically computed if this field is null or empty).
      * Example: 'c3f8ef7053c4fb306f7476e7d1956f0aa992ff9dfdd5244b912a1d377ff3a84f'
      */
-    public $encryptionKeyFingerprint;
+    private $encryptionKeyFingerprint;
 
     /**
      * A private key object to be used for decryption.
      */
-    public $decryptionKey;
+    private $decryptionKey;
 
     /**
      * A list of JSON paths to encrypt in request payloads.
@@ -41,7 +41,7 @@ class FieldLevelEncryptionConfig {
      * )
      * </pre>
      */
-    public $encryptionPaths = array();
+    private $encryptionPaths = array();
 
     /**
      * A list of JSON paths to decrypt in response payloads.
@@ -52,78 +52,78 @@ class FieldLevelEncryptionConfig {
      * )
      * </pre>
      */
-    public $decryptionPaths = array();
+    private $decryptionPaths = array();
 
     /**
      * The digest algorithm to be used for the RSA OAEP padding. Example: 'SHA-512'.
      */
-    public $oaepPaddingDigestAlgorithm;
+    private $oaepPaddingDigestAlgorithm;
 
     /**
      * The name of the payload field where to write/read the digest algorithm used for
      * the RSA OAEP padding (optional, the field won't be set if the name is null or empty).
      */
-    public $oaepPaddingDigestAlgorithmFieldName;
+    private $oaepPaddingDigestAlgorithmFieldName;
 
     /**
      * The name of the HTTP header where to write/read the digest algorithm used for
      * the RSA OAEP padding (optional, the header won't be set if the name is null or empty).
      */
-    public $oaepPaddingDigestAlgorithmHeaderName;
+    private $oaepPaddingDigestAlgorithmHeaderName;
 
     /**
      * The name of the payload field where to write/read the initialization vector value.
      */
-    public $ivFieldName;
+    private $ivFieldName;
 
     /**
      * The name of the header where to write/read the initialization vector value.
      */
-    public $ivHeaderName;
+    private $ivHeaderName;
 
     /**
      * The name of the payload field where to write/read the one-time usage encrypted symmetric key.
      */
-    public $encryptedKeyFieldName;
+    private $encryptedKeyFieldName;
 
     /**
      * The name of the header where to write/read the one-time usage encrypted symmetric key.
      */
-    public $encryptedKeyHeaderName;
+    private $encryptedKeyHeaderName;
 
     /**
      * The name of the payload field where to write/read the encrypted data value.
      */
-    public $encryptedValueFieldName;
+    private $encryptedValueFieldName;
 
     /**
      * The name of the payload field where to write/read the digest of the encryption
      * certificate (optional, the field won't be set if the name is null or empty).
      */
-    public $encryptionCertificateFingerprintFieldName;
+    private $encryptionCertificateFingerprintFieldName;
 
     /**
      * The name of the header where to write/read the digest of the encryption
      * certificate (optional, the header won't be set if the name is null or empty).
      */
-    public $encryptionCertificateFingerprintHeaderName;
+    private $encryptionCertificateFingerprintHeaderName;
 
     /**
      * The name of the payload field where to write/read the digest of the encryption
      * key (optional, the field won't be set if the name is null or empty).
      */
-    public $encryptionKeyFingerprintFieldName;
+    private $encryptionKeyFingerprintFieldName;
 
     /**
      * The name of the header where to write/read the digest of the encryption
      * key (optional, the header won't be set if the name is null or empty).
      */
-    public $encryptionKeyFingerprintHeaderName;
+    private $encryptionKeyFingerprintHeaderName;
 
     /**
      * How the field/header values have to be encoded.
      */
-    public $fieldValueEncoding;
+    private $fieldValueEncoding;
 
     /**
      * If the encryption parameters must be written to/read from HTTP headers.
@@ -139,24 +139,33 @@ class FieldLevelEncryptionConfig {
         return !empty($this->encryptedKeyFieldName) && !empty($this->ivFieldName);
     }
 
-    public function getOaepPaddingDigestAlgorithmHeaderName() {
-        return $this->oaepPaddingDigestAlgorithmHeaderName;
+    /**
+     * FieldLevelEncryptionConfig constructor.
+     */
+    public function __construct($encryptionCertificate, $encryptionCertificateFingerprint, $encryptionKeyFingerprint, $decryptionKey, $encryptionPaths, $decryptionPaths, $oaepPaddingDigestAlgorithm, $oaepPaddingDigestAlgorithmFieldName, $oaepPaddingDigestAlgorithmHeaderName, $ivFieldName, $ivHeaderName, $encryptedKeyFieldName, $encryptedKeyHeaderName, $encryptedValueFieldName, $encryptionCertificateFingerprintFieldName, $encryptionCertificateFingerprintHeaderName, $encryptionKeyFingerprintFieldName, $encryptionKeyFingerprintHeaderName, $fieldValueEncoding) {
+        $this->encryptionCertificate = $encryptionCertificate;
+        $this->encryptionCertificateFingerprint = $encryptionCertificateFingerprint;
+        $this->encryptionKeyFingerprint = $encryptionKeyFingerprint;
+        $this->decryptionKey = $decryptionKey;
+        $this->encryptionPaths = $encryptionPaths;
+        $this->decryptionPaths = $decryptionPaths;
+        $this->oaepPaddingDigestAlgorithm = $oaepPaddingDigestAlgorithm;
+        $this->oaepPaddingDigestAlgorithmFieldName = $oaepPaddingDigestAlgorithmFieldName;
+        $this->oaepPaddingDigestAlgorithmHeaderName = $oaepPaddingDigestAlgorithmHeaderName;
+        $this->ivFieldName = $ivFieldName;
+        $this->ivHeaderName = $ivHeaderName;
+        $this->encryptedKeyFieldName = $encryptedKeyFieldName;
+        $this->encryptedKeyHeaderName = $encryptedKeyHeaderName;
+        $this->encryptedValueFieldName = $encryptedValueFieldName;
+        $this->encryptionCertificateFingerprintFieldName = $encryptionCertificateFingerprintFieldName;
+        $this->encryptionCertificateFingerprintHeaderName = $encryptionCertificateFingerprintHeaderName;
+        $this->encryptionKeyFingerprintFieldName = $encryptionKeyFingerprintFieldName;
+        $this->encryptionKeyFingerprintHeaderName = $encryptionKeyFingerprintHeaderName;
+        $this->fieldValueEncoding = $fieldValueEncoding;
     }
 
-    public function getIvHeaderName() {
-        return $this->ivHeaderName;
-    }
-
-    public function getEncryptedKeyHeaderName() {
-        return $this->encryptedKeyHeaderName;
-    }
-
-    public function getEncryptionCertificateFingerprintHeaderName() {
-        return $this->encryptionCertificateFingerprintHeaderName;
-    }
-
-    public function getEncryptionKeyFingerprintHeaderName() {
-        return $this->encryptionKeyFingerprintHeaderName;
+    public function getEncryptionCertificate() {
+        return $this->encryptionCertificate;
     }
 
     public function getEncryptionCertificateFingerprint() {
@@ -165,5 +174,69 @@ class FieldLevelEncryptionConfig {
 
     public function getEncryptionKeyFingerprint() {
         return $this->encryptionKeyFingerprint;
+    }
+
+    public function getDecryptionKey() {
+        return $this->decryptionKey;
+    }
+
+    public function getEncryptionPaths() {
+        return $this->encryptionPaths;
+    }
+
+    public function getDecryptionPaths() {
+        return $this->decryptionPaths;
+    }
+
+    public function getOaepPaddingDigestAlgorithm() {
+        return $this->oaepPaddingDigestAlgorithm;
+    }
+
+    public function getOaepPaddingDigestAlgorithmFieldName() {
+        return $this->oaepPaddingDigestAlgorithmFieldName;
+    }
+
+    public function getOaepPaddingDigestAlgorithmHeaderName() {
+        return $this->oaepPaddingDigestAlgorithmHeaderName;
+    }
+
+    public function getIvFieldName() {
+        return $this->ivFieldName;
+    }
+
+    public function getIvHeaderName() {
+        return $this->ivHeaderName;
+    }
+
+    public function getEncryptedKeyFieldName() {
+        return $this->encryptedKeyFieldName;
+    }
+
+    public function getEncryptedKeyHeaderName() {
+        return $this->encryptedKeyHeaderName;
+    }
+
+    public function getEncryptedValueFieldName() {
+        return $this->encryptedValueFieldName;
+    }
+
+    public function getEncryptionCertificateFingerprintFieldName() {
+        return $this->encryptionCertificateFingerprintFieldName;
+    }
+
+    public function getEncryptionCertificateFingerprintHeaderName() {
+        return $this->encryptionCertificateFingerprintHeaderName;
+    }
+
+    public function getEncryptionKeyFingerprintFieldName() {
+        return $this->encryptionKeyFingerprintFieldName;
+    }
+
+    public function getEncryptionKeyFingerprintHeaderName() {
+        return $this->encryptionKeyFingerprintHeaderName;
+    }
+
+    public function getFieldValueEncoding() {
+        return $this->fieldValueEncoding;
     }
 }

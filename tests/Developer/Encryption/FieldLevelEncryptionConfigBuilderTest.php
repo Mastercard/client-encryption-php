@@ -31,25 +31,25 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
             ->withFieldValueEncoding(FieldValueEncoding::BASE64)
             ->build();
         $this->assertNotEmpty($config);
-        $this->assertEquals(1, sizeof($config->encryptionPaths));
-        $this->assertNotEmpty($config->encryptionCertificate);
-        $this->assertEquals('97A2FFE9F0D48960EF31E87FCD7A55BF7843FB4A9EEEF01BDB6032AD6FEF146B', $config->encryptionCertificateFingerprint);
-        $this->assertEquals('F806B26BC4870E26986C70B6590AF87BAF4C2B56BB50622C51B12212DAFF2810', $config->encryptionKeyFingerprint);
-        $this->assertEquals('publicCertificateFingerprint', $config->encryptionCertificateFingerprintFieldName);
-        $this->assertEquals('x-public-certificate-fingerprint', $config->encryptionCertificateFingerprintHeaderName);
-        $this->assertEquals('publicKeyFingerprint', $config->encryptionKeyFingerprintFieldName);
-        $this->assertEquals('x-public-key-fingerprint', $config->encryptionKeyFingerprintHeaderName);
-        $this->assertEquals(1, sizeof($config->decryptionPaths));
-        $this->assertNotEmpty($config->decryptionKey);
-        $this->assertEquals('SHA-512', $config->oaepPaddingDigestAlgorithm);
-        $this->assertEquals('encryptedValue', $config->encryptedValueFieldName);
-        $this->assertEquals('encryptedKey', $config->encryptedKeyFieldName);
-        $this->assertEquals('x-encrypted-key', $config->encryptedKeyHeaderName);
-        $this->assertEquals('iv', $config->ivFieldName);
-        $this->assertEquals('x-iv', $config->ivHeaderName);
-        $this->assertEquals('oaepPaddingDigestAlgorithm', $config->oaepPaddingDigestAlgorithmFieldName);
-        $this->assertEquals('x-oaep-padding-digest-algorithm', $config->oaepPaddingDigestAlgorithmHeaderName);
-        $this->assertEquals(FieldValueEncoding::BASE64, $config->fieldValueEncoding);
+        $this->assertEquals(1, sizeof($config->getEncryptionPaths()));
+        $this->assertNotEmpty($config->getEncryptionCertificate());
+        $this->assertEquals('97A2FFE9F0D48960EF31E87FCD7A55BF7843FB4A9EEEF01BDB6032AD6FEF146B', $config->getEncryptionCertificateFingerprint());
+        $this->assertEquals('F806B26BC4870E26986C70B6590AF87BAF4C2B56BB50622C51B12212DAFF2810', $config->getEncryptionKeyFingerprint());
+        $this->assertEquals('publicCertificateFingerprint', $config->getEncryptionCertificateFingerprintFieldName());
+        $this->assertEquals('x-public-certificate-fingerprint', $config->getEncryptionCertificateFingerprintHeaderName());
+        $this->assertEquals('publicKeyFingerprint', $config->getEncryptionKeyFingerprintFieldName());
+        $this->assertEquals('x-public-key-fingerprint', $config->getEncryptionKeyFingerprintHeaderName());
+        $this->assertEquals(1, sizeof($config->getDecryptionPaths()));
+        $this->assertNotEmpty($config->getDecryptionKey());
+        $this->assertEquals('SHA-512', $config->getOaepPaddingDigestAlgorithm());
+        $this->assertEquals('encryptedValue', $config->getEncryptedValueFieldName());
+        $this->assertEquals('encryptedKey', $config->getEncryptedKeyFieldName());
+        $this->assertEquals('x-encrypted-key', $config->getEncryptedKeyHeaderName());
+        $this->assertEquals('iv', $config->getIvFieldName());
+        $this->assertEquals('x-iv', $config->getIvHeaderName());
+        $this->assertEquals('oaepPaddingDigestAlgorithm', $config->getOaepPaddingDigestAlgorithmFieldName());
+        $this->assertEquals('x-oaep-padding-digest-algorithm', $config->getOaepPaddingDigestAlgorithmHeaderName());
+        $this->assertEquals(FieldValueEncoding::BASE64, $config->getFieldValueEncoding());
     }
 
     public function testBuild_ShouldComputeCertificateAndKeyFingerprints_WhenFingerprintsNotSet() {
@@ -59,8 +59,8 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
             ->withEncryptionCertificate(TestUtils::getTestEncryptionCertificate())
             ->withDecryptionKey(TestUtils::getTestDecryptionKey())
             ->build();
-        $this->assertEquals('761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79', $config->encryptionKeyFingerprint);
-        $this->assertEquals('80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279', $config->encryptionCertificateFingerprint);
+        $this->assertEquals('761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79', $config->getEncryptionKeyFingerprint());
+        $this->assertEquals('80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279', $config->getEncryptionCertificateFingerprint());
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenNotDefiniteDecryptionPath() {

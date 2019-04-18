@@ -38,17 +38,17 @@ class FieldLevelEncryptionParams {
         // Generate a random IV
         $ivLength = openssl_cipher_iv_length(self::SYMMETRIC_CYPHER);
         $iv = openssl_random_pseudo_bytes($ivLength);
-        $ivValue = EncodingUtils::encodeBytes($iv, $config->fieldValueEncoding);
+        $ivValue = EncodingUtils::encodeBytes($iv, $config->getFieldValueEncoding());
 
         // Generate an AES secret key
         $secretKey = openssl_random_pseudo_bytes(self::SYMMETRIC_KEY_SIZE / 8);
 
         // Encrypt the secret key
         $encryptedSecretKeyBytes = self::wrapSecretKey($config, $secretKey);
-        $encryptedKeyValue = EncodingUtils::encodeBytes($encryptedSecretKeyBytes, $config->fieldValueEncoding);
+        $encryptedKeyValue = EncodingUtils::encodeBytes($encryptedSecretKeyBytes, $config->getFieldValueEncoding());
 
         // Compute the OAEP padding digest algorithm
-        $oaepPaddingDigestAlgorithmValue = str_replace('-', '', $config->oaepPaddingDigestAlgorithm);
+        $oaepPaddingDigestAlgorithmValue = str_replace('-', '', $config->getOaepPaddingDigestAlgorithm());
 
         $params = new FieldLevelEncryptionParams($config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue);
         $params->secretKey = $secretKey;
@@ -77,7 +77,7 @@ class FieldLevelEncryptionParams {
                 return $this->iv;
             }
             // Decode the IV
-            $this->iv = EncodingUtils::decodeValue($this->ivValue, $this->config->fieldValueEncoding);
+            $this->iv = EncodingUtils::decodeValue($this->ivValue, $this->config->getFieldValueEncoding());
             return $this->iv;
         } catch (\Exception $e) {
             throw new EncryptionException('Failed to decode the provided IV value!', $e);
@@ -93,7 +93,7 @@ class FieldLevelEncryptionParams {
                 return $this->secretKey;
             }
             // Decrypt the AES secret key
-            $encryptedSecretKeyBytes = EncodingUtils::decodeValue($this->encryptedKeyValue, $this->config->fieldValueEncoding);
+            $encryptedSecretKeyBytes = EncodingUtils::decodeValue($this->encryptedKeyValue, $this->config->getFieldValueEncoding());
             $this->secretKey = self::unwrapSecretKey($this->config, $encryptedSecretKeyBytes, $this->oaepPaddingDigestAlgorithmValue);
             return $this->secretKey;
         } catch (EncryptionException $e) {
@@ -108,9 +108,9 @@ class FieldLevelEncryptionParams {
      */
     private static function wrapSecretKey($config, $keyBytes) {
         try {
-            $encryptionCertificate = $config->encryptionCertificate;
+            $encryptionCertificate = $config->getEncryptionCertificate();
             $publicKey = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate));
-            $rsa = self::getRsa($config->oaepPaddingDigestAlgorithm, $publicKey['key'], RSA::PUBLIC_FORMAT_PKCS1);
+            $rsa = self::getRsa($config->getOaepPaddingDigestAlgorithm(), $publicKey['key'], RSA::PUBLIC_FORMAT_PKCS1);
             return $rsa->encrypt($keyBytes);
         } catch (\Exception $e) {
             throw new EncryptionException('Failed to wrap secret key!', $e);
@@ -122,7 +122,7 @@ class FieldLevelEncryptionParams {
      */
     private static function unwrapSecretKey($config, $wrappedKeyBytes, $oaepPaddingDigestAlgorithm) {
         try {
-            $decryptionKey = $config->decryptionKey;
+            $decryptionKey = $config->getDecryptionKey();
             $rawPrivateKey = openssl_pkey_get_details($decryptionKey)['rsa'];
             $rsa = self::getRsa($oaepPaddingDigestAlgorithm, self::toDsigXmlPrivateKey($rawPrivateKey), RSA::PRIVATE_FORMAT_XML);
             return $rsa->decrypt($wrappedKeyBytes);
