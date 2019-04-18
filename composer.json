@@ -23,7 +23,7 @@
         "guzzlehttp/guzzle": "^6.2"
     },
     "suggest": {
-        "psr/http-message": "Allow usage of the PsrHttpMessageSigner class"
+        "psr/http-message": "Allow usage of the PsrHttpMessageEncryptionInterceptor class"
     },
     "autoload": {
         "psr-4": {
