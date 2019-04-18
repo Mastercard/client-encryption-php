@@ -84,7 +84,10 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
             ->withEncryptionKeyFingerprintHeaderName('x-encryption-key-fingerprint')
             ->build();
         $payload = '{"foo":"bår"}';
-        $headers = ['Content-Type' => 'application/json'];
+        $headers = [
+            'Content-Type' => 'application/json',
+            'x-encryption-certificate-fingerprint' => 'some previous value'
+        ];
         $request = new Request('POST', 'https://api.mastercard.com/service', $headers, $payload);
 
         // WHEN
@@ -101,6 +104,7 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $this->assertEquals(1, sizeof($request->getHeader('x-iv')));
         $this->assertEquals(1, sizeof($request->getHeader('x-encrypted-key')));
         $this->assertEquals('SHA256', $request->getHeader('x-oaep-padding-digest-algorithm')[0]);
+        $this->assertEquals(1, sizeof($request->getHeader('x-encryption-certificate-fingerprint')));
         $this->assertEquals('80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279', $request->getHeader('x-encryption-certificate-fingerprint')[0]);
         $this->assertEquals('761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79', $request->getHeader('x-encryption-key-fingerprint')[0]);
     }
@@ -197,7 +201,7 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
             'x-encrypted-key' => 'a31cfe7a7981b72428c013270619554c1d645c04b9d51c7eaf996f55749ef62fd7c7f8d334f95913be41ae38c46d192670fd1acb84ebb85a00cd997f1a9a3f782229c7bf5f0fdf49fe404452d7ed4fd41fbb95b787d25893fbf3d2c75673cecc8799bbe3dd7eb4fe6d3f744b377572cdf8aba1617194e10475b6cd6a8dd4fb8264f8f51534d8f7ac7c10b4ce9c44d15066724b03a0ab0edd512f9e6521fdb5841cd6964e457d6b4a0e45ba4aac4e77d6bbe383d6147e751fa88bc26278bb9690f9ee84b17123b887be2dcef0873f4f9f2c895d90e23456fafb01b99885e31f01a3188f0ad47edf22999cc1d0ddaf49e1407375117b5d66f1f185f2b57078d255',
             'x-oaep-padding-digest-algorithm' => 'SHA256',
             'x-encryption-key-fingerprint' => '761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79',
-            'x-encryption-certificate-fingerprint' => '80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279'
+            'X-ENCRYPTION-CERTIFICATE-FINGERPRINT' => '80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279'
         ];
         $response = new Response(200, $headers, $encryptedPayload);
 

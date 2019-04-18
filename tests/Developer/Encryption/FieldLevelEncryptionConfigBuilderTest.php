@@ -8,6 +8,61 @@ use PHPUnit\Framework\TestCase;
 
 class FieldLevelEncryptionConfigBuilderTest extends TestCase {
 
+    public function testBuild_Nominal() {
+        $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
+            ->withEncryptionPath('$.payload', '$.encryptedPayload')
+            ->withEncryptionCertificate(TestUtils::getTestEncryptionCertificate())
+            ->withEncryptionCertificateFingerprint('97A2FFE9F0D48960EF31E87FCD7A55BF7843FB4A9EEEF01BDB6032AD6FEF146B')
+            ->withEncryptionKeyFingerprint('F806B26BC4870E26986C70B6590AF87BAF4C2B56BB50622C51B12212DAFF2810')
+            ->withEncryptionCertificateFingerprintFieldName('publicCertificateFingerprint')
+            ->withEncryptionCertificateFingerprintHeaderName('x-public-certificate-fingerprint')
+            ->withEncryptionKeyFingerprintFieldName('publicKeyFingerprint')
+            ->withEncryptionKeyFingerprintHeaderName('x-public-key-fingerprint')
+            ->withDecryptionPath('$.encryptedPayload', '$.payload')
+            ->withDecryptionKey(TestUtils::getTestDecryptionKey())
+            ->withOaepPaddingDigestAlgorithm('SHA-512')
+            ->withOaepPaddingDigestAlgorithmFieldName('oaepPaddingDigestAlgorithm')
+            ->withOaepPaddingDigestAlgorithmHeaderName('x-oaep-padding-digest-algorithm')
+            ->withEncryptedValueFieldName('encryptedValue')
+            ->withEncryptedKeyFieldName('encryptedKey')
+            ->withEncryptedKeyHeaderName('x-encrypted-key')
+            ->withIvFieldName('iv')
+            ->withIvHeaderName('x-iv')
+            ->withFieldValueEncoding(FieldValueEncoding::BASE64)
+            ->build();
+        $this->assertNotEmpty($config);
+        $this->assertEquals(1, sizeof($config->encryptionPaths));
+        $this->assertNotEmpty($config->encryptionCertificate);
+        $this->assertEquals('97A2FFE9F0D48960EF31E87FCD7A55BF7843FB4A9EEEF01BDB6032AD6FEF146B', $config->encryptionCertificateFingerprint);
+        $this->assertEquals('F806B26BC4870E26986C70B6590AF87BAF4C2B56BB50622C51B12212DAFF2810', $config->encryptionKeyFingerprint);
+        $this->assertEquals('publicCertificateFingerprint', $config->encryptionCertificateFingerprintFieldName);
+        $this->assertEquals('x-public-certificate-fingerprint', $config->encryptionCertificateFingerprintHeaderName);
+        $this->assertEquals('publicKeyFingerprint', $config->encryptionKeyFingerprintFieldName);
+        $this->assertEquals('x-public-key-fingerprint', $config->encryptionKeyFingerprintHeaderName);
+        $this->assertEquals(1, sizeof($config->decryptionPaths));
+        $this->assertNotEmpty($config->decryptionKey);
+        $this->assertEquals('SHA-512', $config->oaepPaddingDigestAlgorithm);
+        $this->assertEquals('encryptedValue', $config->encryptedValueFieldName);
+        $this->assertEquals('encryptedKey', $config->encryptedKeyFieldName);
+        $this->assertEquals('x-encrypted-key', $config->encryptedKeyHeaderName);
+        $this->assertEquals('iv', $config->ivFieldName);
+        $this->assertEquals('x-iv', $config->ivHeaderName);
+        $this->assertEquals('oaepPaddingDigestAlgorithm', $config->oaepPaddingDigestAlgorithmFieldName);
+        $this->assertEquals('x-oaep-padding-digest-algorithm', $config->oaepPaddingDigestAlgorithmHeaderName);
+        $this->assertEquals(FieldValueEncoding::BASE64, $config->fieldValueEncoding);
+    }
+
+    public function testBuild_ShouldComputeCertificateAndKeyFingerprints_WhenFingerprintsNotSet() {
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withEncryptionCertificateFingerprint(null)
+            ->withEncryptionKeyFingerprint(null)
+            ->withEncryptionCertificate(TestUtils::getTestEncryptionCertificate())
+            ->withDecryptionKey(TestUtils::getTestDecryptionKey())
+            ->build();
+        $this->assertEquals('761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79', $config->encryptionKeyFingerprint);
+        $this->assertEquals('80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279', $config->encryptionCertificateFingerprint);
+    }
+
     public function testBuild_ShouldThrowInvalidArgumentException_WhenNotDefiniteDecryptionPath() {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('JSON paths for decryption must point to a single item!');
@@ -139,49 +194,5 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
             ->withIvHeaderName('x-iv')
             ->withFieldValueEncoding(FieldValueEncoding::HEX)
             ->build();
-    }
-
-    public function testBuild_Nominal() {
-        $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
-            ->withEncryptionPath('$.payload', '$.encryptedPayload')
-            ->withEncryptionCertificate(TestUtils::getTestEncryptionCertificate())
-            ->withEncryptionCertificateFingerprint('97A2FFE9F0D48960EF31E87FCD7A55BF7843FB4A9EEEF01BDB6032AD6FEF146B')
-            ->withEncryptionKeyFingerprint('F806B26BC4870E26986C70B6590AF87BAF4C2B56BB50622C51B12212DAFF2810')
-            ->withEncryptionCertificateFingerprintFieldName('publicCertificateFingerprint')
-            ->withEncryptionCertificateFingerprintHeaderName('x-public-certificate-fingerprint')
-            ->withEncryptionKeyFingerprintFieldName('publicKeyFingerprint')
-            ->withEncryptionKeyFingerprintHeaderName('x-public-key-fingerprint')
-            ->withDecryptionPath('$.encryptedPayload', '$.payload')
-            ->withDecryptionKey(TestUtils::getTestDecryptionKey())
-            ->withOaepPaddingDigestAlgorithm('SHA-512')
-            ->withOaepPaddingDigestAlgorithmFieldName('oaepPaddingDigestAlgorithm')
-            ->withOaepPaddingDigestAlgorithmHeaderName('x-oaep-padding-digest-algorithm')
-            ->withEncryptedValueFieldName('encryptedValue')
-            ->withEncryptedKeyFieldName('encryptedKey')
-            ->withEncryptedKeyHeaderName('x-encrypted-key')
-            ->withIvFieldName('iv')
-            ->withIvHeaderName('x-iv')
-            ->withFieldValueEncoding(FieldValueEncoding::BASE64)
-            ->build();
-        $this->assertNotEmpty($config);
-        $this->assertEquals(1, sizeof($config->encryptionPaths));
-        $this->assertNotEmpty($config->encryptionCertificate);
-        $this->assertEquals('97A2FFE9F0D48960EF31E87FCD7A55BF7843FB4A9EEEF01BDB6032AD6FEF146B', $config->encryptionCertificateFingerprint);
-        $this->assertEquals('F806B26BC4870E26986C70B6590AF87BAF4C2B56BB50622C51B12212DAFF2810', $config->encryptionKeyFingerprint);
-        $this->assertEquals('publicCertificateFingerprint', $config->encryptionCertificateFingerprintFieldName);
-        $this->assertEquals('x-public-certificate-fingerprint', $config->encryptionCertificateFingerprintHeaderName);
-        $this->assertEquals('publicKeyFingerprint', $config->encryptionKeyFingerprintFieldName);
-        $this->assertEquals('x-public-key-fingerprint', $config->encryptionKeyFingerprintHeaderName);
-        $this->assertEquals(1, sizeof($config->decryptionPaths));
-        $this->assertNotEmpty($config->decryptionKey);
-        $this->assertEquals('SHA-512', $config->oaepPaddingDigestAlgorithm);
-        $this->assertEquals('encryptedValue', $config->encryptedValueFieldName);
-        $this->assertEquals('encryptedKey', $config->encryptedKeyFieldName);
-        $this->assertEquals('x-encrypted-key', $config->encryptedKeyHeaderName);
-        $this->assertEquals('iv', $config->ivFieldName);
-        $this->assertEquals('x-iv', $config->ivHeaderName);
-        $this->assertEquals('oaepPaddingDigestAlgorithm', $config->oaepPaddingDigestAlgorithmFieldName);
-        $this->assertEquals('x-oaep-padding-digest-algorithm', $config->oaepPaddingDigestAlgorithmHeaderName);
-        $this->assertEquals(FieldValueEncoding::BASE64, $config->fieldValueEncoding);
     }
 }

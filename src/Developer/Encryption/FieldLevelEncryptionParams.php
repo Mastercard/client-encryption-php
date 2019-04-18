@@ -2,7 +2,6 @@
 
 namespace Mastercard\Developer\Encryption;
 use Mastercard\Developer\Utils\EncodingUtils;
-use phpseclib\Crypt\Hash;
 use phpseclib\Crypt\RSA;
 
 /**
@@ -17,20 +16,14 @@ class FieldLevelEncryptionParams {
     private $ivValue;
     private $encryptedKeyValue;
     private $oaepPaddingDigestAlgorithmValue;
-    private $encryptionCertificateFingerprintValue;
-    private $encryptionKeyFingerprintValue;
     private $config;
     private $secretKey;
     private $iv;
 
-    public function __construct($config, $ivValue, $encryptedKeyValue,
-                                $oaepPaddingDigestAlgorithmValue = null, $encryptionCertificateFingerprintValue = null,
-                                $encryptionKeyFingerprintValue = null) {
+    public function __construct($config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue = null) {
         $this->ivValue = $ivValue;
         $this->encryptedKeyValue = $encryptedKeyValue;
         $this->oaepPaddingDigestAlgorithmValue = $oaepPaddingDigestAlgorithmValue;
-        $this->encryptionCertificateFingerprintValue = $encryptionCertificateFingerprintValue;
-        $this->encryptionKeyFingerprintValue = $encryptionKeyFingerprintValue;
         $this->config = $config;
     }
 
@@ -54,13 +47,10 @@ class FieldLevelEncryptionParams {
         $encryptedSecretKeyBytes = self::wrapSecretKey($config, $secretKey);
         $encryptedKeyValue = EncodingUtils::encodeBytes($encryptedSecretKeyBytes, $config->fieldValueEncoding);
 
-        // Compute fingerprints and OAEP padding digest algorithm
-        $encryptionCertificateFingerprintValue = self::getOrComputeEncryptionCertificateFingerprint($config);
-        $encryptionKeyFingerprintValue = self::getOrComputeEncryptionKeyFingerprint($config);
+        // Compute the OAEP padding digest algorithm
         $oaepPaddingDigestAlgorithmValue = str_replace('-', '', $config->oaepPaddingDigestAlgorithm);
 
-        $params = new FieldLevelEncryptionParams($config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue,
-            $encryptionCertificateFingerprintValue, $encryptionKeyFingerprintValue);
+        $params = new FieldLevelEncryptionParams($config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue);
         $params->secretKey = $secretKey;
         $params->iv = $iv;
         return $params;
@@ -72,14 +62,6 @@ class FieldLevelEncryptionParams {
 
     public function getEncryptedKeyValue() {
         return $this->encryptedKeyValue;
-    }
-
-    public function getEncryptionCertificateFingerprintValue() {
-        return $this->encryptionCertificateFingerprintValue;
-    }
-
-    public function getEncryptionKeyFingerprintValue() {
-        return $this->encryptionKeyFingerprintValue;
     }
 
     public function getOaepPaddingDigestAlgorithmValue() {
@@ -170,42 +152,5 @@ class FieldLevelEncryptionParams {
             '  <InverseQ>' . base64_encode($raw['iqmp']) . "</InverseQ>\r\n" .
             '  <D>' . base64_encode($raw['d']) . "</D>\r\n" .
             '</RSAKeyValue>';
-    }
-
-    /**
-     * @throws EncryptionException
-     */
-    private static function getOrComputeEncryptionCertificateFingerprint($config) {
-        try {
-            $providedCertificateFingerprintValue = $config->encryptionCertificateFingerprint;
-            if (!empty($providedCertificateFingerprintValue)) {
-                return $providedCertificateFingerprintValue;
-            } else {
-                $encryptionCertificate = $config->encryptionCertificate;
-                return openssl_x509_fingerprint($encryptionCertificate, 'sha256');
-            }
-        } catch (\Exception $e) {
-            throw new EncryptionException('Failed to compute encryption certificate fingerprint!', $e);
-        }
-    }
-
-    /**
-     * @throws EncryptionException
-     */
-    private static function getOrComputeEncryptionKeyFingerprint($config) {
-        try {
-            $providedKeyFingerprintValue = $config->encryptionKeyFingerprint;
-            if (!empty($providedKeyFingerprintValue)) {
-                return $providedKeyFingerprintValue;
-            } else {
-                $encryptionCertificate = $config->encryptionCertificate;
-                $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate))['key'];
-                $publicKeyDer = EncodingUtils::pemToDer($publicKeyPem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
-                $hash = new Hash('sha256');
-                return EncodingUtils::encodeBytes($hash->hash($publicKeyDer), FieldValueEncoding::HEX);
-            }
-        } catch (\Exception $e) {
-            throw new EncryptionException('Failed to compute encryption key fingerprint!', $e);
-        }
     }
 }

@@ -117,10 +117,10 @@ class FieldLevelEncryption {
             $outJsonObject->{$config->encryptedKeyFieldName} = $params->getEncryptedKeyValue();
         }
         if (!empty($config->encryptionCertificateFingerprintFieldName)) {
-            $outJsonObject->{$config->encryptionCertificateFingerprintFieldName} = $params->getEncryptionCertificateFingerprintValue();
+            $outJsonObject->{$config->encryptionCertificateFingerprintFieldName} = $config->encryptionCertificateFingerprint;
         }
         if (!empty($config->encryptionKeyFingerprintFieldName)) {
-            $outJsonObject->{$config->encryptionKeyFingerprintFieldName} = $params->getEncryptionKeyFingerprintValue();
+            $outJsonObject->{$config->encryptionKeyFingerprintFieldName} = $config->encryptionKeyFingerprint;
         }
         if (!empty($config->oaepPaddingDigestAlgorithmFieldName)) {
             $outJsonObject->{$config->oaepPaddingDigestAlgorithmFieldName} = $params->getOaepPaddingDigestAlgorithmValue();

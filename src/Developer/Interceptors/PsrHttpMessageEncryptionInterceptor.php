@@ -45,8 +45,8 @@ class PsrHttpMessageEncryptionInterceptor {
                 $params = FieldLevelEncryptionParams::generate($this->config);
                 self::updateHeader($request, $this->config->getIvHeaderName(), $params->getIvValue());
                 self::updateHeader($request, $this->config->getEncryptedKeyHeaderName(), $params->getEncryptedKeyValue());
-                self::updateHeader($request, $this->config->getEncryptionCertificateFingerprintHeaderName(), $params->getEncryptionCertificateFingerprintValue());
-                self::updateHeader($request, $this->config->getEncryptionKeyFingerprintHeaderName(), $params->getEncryptionKeyFingerprintValue());
+                self::updateHeader($request, $this->config->getEncryptionCertificateFingerprintHeaderName(), $this->config->getEncryptionCertificateFingerprint());
+                self::updateHeader($request, $this->config->getEncryptionKeyFingerprintHeaderName(), $this->config->getEncryptionKeyFingerprint());
                 self::updateHeader($request, $this->config->getOaepPaddingDigestAlgorithmHeaderName(), $params->getOaepPaddingDigestAlgorithmValue());
                 $encryptedPayload = FieldLevelEncryption::encryptPayload($payload, $this->config, $params);
             } else {

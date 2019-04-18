@@ -3,6 +3,8 @@
 namespace Mastercard\Developer\Encryption;
 
 use Mastercard\Developer\Json\JsonPath;
+use Mastercard\Developer\Utils\EncodingUtils;
+use phpseclib\Crypt\Hash;
 
 /**
  * A builder class for FieldLevelEncryptionConfig.
@@ -195,12 +197,16 @@ class FieldLevelEncryptionConfigBuilder {
     /**
      * Build a FieldLevelEncryptionConfig.
      * @see FieldLevelEncryptionConfig
+     * @throws EncryptionException, InvalidArgumentException
      */
     public function build() {
 
         $this->checkJsonPathParameterValues();
         $this->checkParameterValues();
         $this->checkParameterConsistency();
+
+        $this->computeEncryptionCertificateFingerprintWhenNeeded();
+        $this->computeEncryptionKeyFingerprintWhenNeeded();
 
         $config = new FieldLevelEncryptionConfig();
         $config->encryptionCertificateFingerprintFieldName = $this->encryptionCertificateFingerprintFieldName;
@@ -281,6 +287,35 @@ class FieldLevelEncryptionConfigBuilder {
         if (!empty($this->ivFieldName) && empty($this->encryptedKeyFieldName)
             || empty($this->ivFieldName) && !empty($this->encryptedKeyFieldName)) {
             throw new \InvalidArgumentException('IV field name and encrypted key field name must be both set or both unset!');
+        }
+    }
+
+    private function computeEncryptionCertificateFingerprintWhenNeeded() {
+        $providedEncryptionCertificate = $this->encryptionCertificate;
+        if (empty($providedEncryptionCertificate) || !empty($this->encryptionCertificateFingerprint)) {
+            // No encryption certificate set or certificate fingerprint already provided
+            return;
+        }
+        try {
+            $this->encryptionCertificateFingerprint = openssl_x509_fingerprint($providedEncryptionCertificate, 'sha256');
+        } catch (\Exception $e) {
+            throw new EncryptionException('Failed to compute encryption certificate fingerprint!', $e);
+        }
+    }
+
+    private function computeEncryptionKeyFingerprintWhenNeeded() {
+        $providedEncryptionCertificate = $this->encryptionCertificate;
+        if (empty($providedEncryptionCertificate) || !empty($this->encryptionKeyFingerprint)) {
+            // No encryption certificate set or key fingerprint already provided
+            return;
+        }
+        try {
+            $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($providedEncryptionCertificate))['key'];
+            $publicKeyDer = EncodingUtils::pemToDer($publicKeyPem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
+            $hash = new Hash('sha256');
+            $this->encryptionKeyFingerprint = EncodingUtils::encodeBytes($hash->hash($publicKeyDer), FieldValueEncoding::HEX);
+        } catch (\Exception $e) {
+            throw new EncryptionException('Failed to compute encryption key fingerprint!', $e);
         }
     }
 }

@@ -158,4 +158,12 @@ class FieldLevelEncryptionConfig {
     public function getEncryptionKeyFingerprintHeaderName() {
         return $this->encryptionKeyFingerprintHeaderName;
     }
+
+    public function getEncryptionCertificateFingerprint() {
+        return $this->encryptionCertificateFingerprint;
+    }
+
+    public function getEncryptionKeyFingerprint() {
+        return $this->encryptionKeyFingerprint;
+    }
 }
