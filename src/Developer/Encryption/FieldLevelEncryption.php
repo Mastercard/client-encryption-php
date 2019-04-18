@@ -4,14 +4,13 @@ namespace Mastercard\Developer\Encryption;
 
 use Mastercard\Developer\Json\JsonPath;
 use Mastercard\Developer\Utils\EncodingUtils;
+use phpseclib\Crypt\AES;
 
 /**
  * Performs field level encryption on HTTP payloads.
  * @package Mastercard\Developer\Encryption
  */
 class FieldLevelEncryption {
-
-    const SYMMETRIC_CYPHER = 'AES-128-CBC';
 
     private function __construct() {}
 
@@ -241,7 +240,10 @@ class FieldLevelEncryption {
     }
 
     private static function encryptBytes($key, $iv, $bytes) {
-        $encryptedBytes = openssl_encrypt($bytes, self::SYMMETRIC_CYPHER, $key, OPENSSL_RAW_DATA, $iv);
+        $aes = new AES();
+        $aes->setKey($key);
+        $aes->setIV($iv);
+        $encryptedBytes = $aes->encrypt($bytes);
         if (false === $encryptedBytes) {
             throw new EncryptionException('Failed to encrypt bytes!');
         }
@@ -249,7 +251,10 @@ class FieldLevelEncryption {
     }
 
     private static function decryptBytes($key, $iv, $encryptedBytes) {
-        $bytes = openssl_decrypt($encryptedBytes, self::SYMMETRIC_CYPHER, $key, OPENSSL_RAW_DATA, $iv);
+        $aes = new AES();
+        $aes->setKey($key);
+        $aes->setIV($iv);
+        $bytes = $aes->decrypt($encryptedBytes);
         if (false === $bytes) {
             throw new EncryptionException('Failed to decrypt bytes with the provided key and IV!');
         }
