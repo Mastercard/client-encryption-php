@@ -33,7 +33,7 @@ after_success:
       -Dsonar.organization=$SONAR_ORGANIZATION_KEY \
       -Dsonar.sources=./src \
       -Dsonar.tests=./tests \
-      -Dsonar.exclusions=**/vendor/**,**/tests/**,**/*.xml,**/JsonPath.php \
+      -Dsonar.exclusions=**/vendor/**,**/tests/**,**/*.xml \
       -Dsonar.php.tests.reportPath=tests.xml \
       -Dsonar.php.coverage.reportPaths=coverage.xml \
       -Dsonar.host.url=$SONAR_URL \
