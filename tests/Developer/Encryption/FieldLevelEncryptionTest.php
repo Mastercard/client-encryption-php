@@ -4,6 +4,7 @@ namespace Mastercard\Developer\Encryption;
 
 use Mastercard\Developer\Test\TestUtils;
 use Mastercard\Developer\Utils\EncryptionUtils;
+use Mastercard\Developer\Utils\StringUtils;
 use PHPUnit\Framework\TestCase;
 
 class FieldLevelEncryptionTest extends TestCase {
@@ -49,6 +50,28 @@ class FieldLevelEncryptionTest extends TestCase {
         // THEN
         $expectedBytes = 'some data ù€@';
         $this->assertEquals($expectedBytes, $decryptedBytes);
+    }
+
+    public function testDecryptPayload_InteroperabilityTest() {
+    
+        // GIVEN
+        $encryptedPayload = '{"data":"WtBPYHL5jdU/BsECYzlyRUPIElWCwSCgKhk5RPy2AMZBGmC8OUJ1L9HC/SF2QpCU+ucZTmo7XOjhSdVi0/yrdZP1OG7dVWcW4MEWpxiU1gl0fS0LKKPOFjEymSP5f5otdTFCp00xPfzp+l6K3S3kZTAuSG1gh6TaRL+qfC1POz8KxhCEL8D1MDvxnlmchPx/hEyAzav0AID3T7T4WomzUXErNrnbDCCiL6pm4IBR8cDAzU4eSmTxdzZFyvTpBQDXVyFdkaNTo3GXk837wujVK8EX3c+gsJvMq4XVJFwGmPNhPM6P7OmdK45cldWrD5j2gO2VBH5aW1EXfot7d11bjJC9T8D/ZOQFF6uLIG7J9x9R0Ts0zXD/H24y9/jF30rKKX7TNmKHn5uh1Czd+h7ryIAqaQsOu6ILBKfH7W/NIR5qYN1GiL/kOYwx2pdIGQdcdolVdxV8Z6bt4Tcvq3jSZaCbhJI/kphZL7QHJgcG6luz9k0457x/0QCDPlve6JNgUQzAOYC64X0a07JpERH0O08/YbntKEq6qf7UhloyI5A="}';
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withDecryptionKey(EncryptionUtils::loadDecryptionKey('./resources/keys/pkcs1/test_key_pkcs1-2048.pem'))
+            ->withDecryptionPath('$', '$')
+            ->withEncryptedValueFieldName('data')
+            ->withFieldValueEncoding(FieldValueEncoding::BASE64)
+            ->build();
+        $oaepPaddingDigest = 'SHA256';
+        $encryptedKey = 'dobCRy+NUxdQdN0oMLT4dXUzQ+We7BahMfJunoAmwwUpk9jJrW66BASPalS2QWChPaKDM4Ft/BeNsu0wBoUZ0hHIT9ftx5g4tY6Xu2iLRiFWFDCHYOSdL+yVv98FcM6fxc34FNyg3/rOPWeyS3Q9YAOgcqiCwWYu4kqa34tNWCW1vnTmtz+dCKiiCZo/uHUkCtoAI5fEe+inHHToZL+LFlQ2Xd0u/nsu5Ep14Il5mTv8FyfLgwRgfilcqy4t2Kh3bpZ46LllO36DHXtQoI1e0ayMFfKTO87++NWxYNOilrverJ01WHnA+PyXhg4XU3RlU0CVWBN06fKbHBDH6GCmOA==';
+        $iv = '+yBXlo+gYGe2q0xzLDLLzQ==';
+        
+        // WHEN
+        $params = new FieldLevelEncryptionParams($config, $iv, $encryptedKey, $oaepPaddingDigest);
+        $payload = FieldLevelEncryption::decryptPayload($encryptedPayload, $config, $params);
+        
+        // THEN
+        $this->assertTrue(StringUtils::contains($payload, 'account'));
     }
 
     public function testEncryptPayload_Nominal() {
