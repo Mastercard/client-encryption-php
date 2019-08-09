@@ -162,6 +162,29 @@ class FieldLevelEncryptionTest extends TestCase {
         self::assertDecryptedPayloadEquals('{"data": "string"}', $encryptedPayload, $config);
     }
 
+    public function testEncryptPayload_ShouldEncryptPrimitiveTypes_NumberAsString() {
+
+        // GIVEN
+        $payload = '{
+            "data": "123",
+            "encryptedData": {}
+        }';
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withEncryptionPath('data', 'encryptedData')
+            ->withDecryptionPath('encryptedData', 'data')
+            ->withOaepPaddingDigestAlgorithm('SHA-256')
+            ->build();
+
+        // WHEN
+        $encryptedPayload = FieldLevelEncryption::encryptPayload($payload, $config);
+
+        // THEN
+        $encryptedPayloadObject = json_decode($encryptedPayload);
+        $this->assertFalse(property_exists($encryptedPayloadObject, 'data'));
+        $this->assertNotEmpty($encryptedPayloadObject->encryptedData);
+        self::assertDecryptedPayloadEquals('{"data": 123}', $encryptedPayload, $config);
+    }
+
     public function testEncryptPayload_ShouldEncryptPrimitiveTypes_Integer() {
 
         // GIVEN
