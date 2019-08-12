@@ -93,7 +93,7 @@ class FieldLevelEncryption {
         }
 
         // Encrypt data at the given JSON path
-        $inJsonString = self::sanitizeJson(json_encode($inJsonObject));
+        $inJsonString = self::sanitizeJson(self::toJsonString($inJsonObject));
         $encryptedValueBytes = self::encryptBytes($params->getSecretKeyBytes(), $params->getIvBytes(), $inJsonString);
         $encryptedValue = EncodingUtils::encodeBytes($encryptedValueBytes, $config->getFieldValueEncoding());
 
@@ -259,6 +259,16 @@ class FieldLevelEncryption {
             throw new EncryptionException('Failed to decrypt bytes with the provided key and IV!');
         }
         return $bytes;
+    }
+
+    private static function toJsonString($object) {
+        if (is_null($object)) {
+            throw new \InvalidArgumentException('Can\'t get a JSON string from a null object!');
+        }
+        if (!is_object($object) && !is_array($object)) {
+            return $object;
+        }
+        return json_encode($object);
     }
 
     private static function sanitizeJson($json) {
