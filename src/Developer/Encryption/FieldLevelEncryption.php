@@ -170,7 +170,8 @@ class FieldLevelEncryption {
         self::addDecryptedDataToPayload($payloadJsonObject, $jsonPathOut, $outJsonObject, $decryptedValue);
 
         // Remove the input if now empty
-        if (empty((array)$inJsonObject) && '$' !== $jsonPathIn) {
+        $inJsonElement = self::readJsonElement($payloadJsonObject, $jsonPathIn);
+        if (empty((array)$inJsonElement) && '$' !== $jsonPathIn) {
             JsonPath::delete($payloadJsonObject, $jsonPathIn);
         }
     }
