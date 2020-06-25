@@ -127,7 +127,7 @@ $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
 
 See also:
 * [FieldLevelEncryptionConfig.php](https://github.com/Mastercard/client-encryption-php/blob/master/src/Developer/Encryption/FieldLevelEncryptionConfig.php) for all config options
-* [Service configurations in PHP](https://github.com/Mastercard/client-encryption-php/wiki/Service-Configurations-in-PHP) wiki page
+* [Service Configurations for Client Encryption PHP](https://github.com/Mastercard/client-encryption-php/wiki/Service-Configurations-for-Client-Encryption-PHP)
 
 #### Performing Encryption <a name="performing-encryption"></a>
 
