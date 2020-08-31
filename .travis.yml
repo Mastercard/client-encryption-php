@@ -11,6 +11,7 @@ matrix:
     - php: '7.1'
     - php: '7.2'
     - php: '7.3'
+    - php: '7.4'
       env:
         # Do not run analysis on PR (secure env variables like SONAR_TOKEN are not always available)
         - WITH_SONAR_ANALYSIS=$([ "$TRAVIS_PULL_REQUEST" = "false" ] && echo true || echo false)

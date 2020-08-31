@@ -4,6 +4,8 @@
     "type": "library",
     "license": "MIT",
     "keywords": [
+        "openapi",
+        "mastercard",
         "field-level-encryption",
         "fle",
         "encryption",
