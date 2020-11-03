@@ -12,8 +12,6 @@ use phpseclib\Crypt\AES;
  */
 class FieldLevelEncryption {
 
-    private function __construct() {}
-
     /**
      * Encrypt parts of a JSON payload using the given parameters and configuration.
      * @param $payload A JSON string
@@ -196,7 +194,7 @@ class FieldLevelEncryption {
             $outJsonObject->$key = $value;
         }
     }
-    
+
     private static function readJsonElement($payloadJsonObject, $jsonPath) {
         return JsonPath::find($payloadJsonObject, $jsonPath);
     }
