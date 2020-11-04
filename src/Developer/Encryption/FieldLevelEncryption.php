@@ -12,6 +12,7 @@ use phpseclib\Crypt\AES;
  */
 class FieldLevelEncryption {
 
+    //NOSONAR
     private function __construct() {
         // This class can't be instantiated
     }

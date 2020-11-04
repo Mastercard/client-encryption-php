@@ -14,6 +14,7 @@ class EncryptionUtils {
     const PKCS_8_PEM_HEADER = '-----BEGIN PRIVATE KEY-----';
     const PKCS_8_PEM_FOOTER = '-----END PRIVATE KEY-----';
 
+    //NOSONAR
     private function __construct() {
         // This class can't be instantiated
     }
