@@ -5,6 +5,7 @@ use Mastercard\Developer\Encryption\FieldValueEncoding;
 
 class EncodingUtils {
 
+    //NOSONAR
     private function __construct() {
         // This class can't be instantiated
     }
