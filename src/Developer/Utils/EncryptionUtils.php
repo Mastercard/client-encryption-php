@@ -14,6 +14,10 @@ class EncryptionUtils {
     const PKCS_8_PEM_HEADER = '-----BEGIN PRIVATE KEY-----';
     const PKCS_8_PEM_FOOTER = '-----END PRIVATE KEY-----';
 
+    private function __construct() {
+        // This class can't be instantiated
+    }
+
     /**
      * Create an X.509 resource from the certificate data at the given file path.
      * @throws \InvalidArgumentException

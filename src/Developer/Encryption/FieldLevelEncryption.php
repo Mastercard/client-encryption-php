@@ -12,6 +12,10 @@ use phpseclib\Crypt\AES;
  */
 class FieldLevelEncryption {
 
+    private function __construct() {
+        // This class can't be instantiated
+    }
+
     /**
      * Encrypt parts of a JSON payload using the given parameters and configuration.
      * @param $payload A JSON string
