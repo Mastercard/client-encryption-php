@@ -57,7 +57,7 @@ class JsonPath {
         $currentElement = $jsonObject;
         while ($currentPath !== '$') {
             preg_match(self::FIRST_CHILD_KEY, $currentPath, $matches);
-            if (sizeof($matches).isEmpty()) {
+            if (empty($matches)) {
                 return null;
             }
             $childKey = $matches[1];
