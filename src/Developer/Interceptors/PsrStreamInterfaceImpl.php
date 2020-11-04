@@ -40,7 +40,9 @@ class PsrStreamInterfaceImpl implements StreamInterface {
         return null;
     }
 
-    public function rewind() {}
+    public function rewind() {
+        return null;
+    }
 
     public function isWritable() {
         return false;

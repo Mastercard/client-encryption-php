@@ -33,8 +33,6 @@ class FieldLevelEncryptionConfigBuilder {
     private $encryptionKeyFingerprintHeaderName;
     private $fieldValueEncoding;
 
-    private function __construct() {}
-
     /**
      * Get an instance of the builder.
      */

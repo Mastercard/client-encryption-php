@@ -46,7 +46,7 @@ class PsrStreamInterfaceImplTest extends TestCase {
     }
 
     public function testRewind() {
-        $this->instanceUnderTest->rewind();
+        $this->assertNull($this->instanceUnderTest->rewind());
     }
 
     public function testIsWritable() {
