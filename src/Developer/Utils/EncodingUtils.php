@@ -5,6 +5,10 @@ use Mastercard\Developer\Encryption\FieldValueEncoding;
 
 class EncodingUtils {
 
+    private function __construct() {
+        // This class can't be instantiated
+    }
+
     static function encodeBytes($bytes, $encoding) {
         return $encoding === FieldValueEncoding::HEX ? self::hexEncode($bytes) : base64_encode($bytes);
     }

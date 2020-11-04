@@ -13,6 +13,10 @@ use phpseclib\Crypt\Hash;
  */
 class FieldLevelEncryptionConfigBuilder {
 
+    private function __construct() {
+        // This class can't be instantiated
+    }
+
     private $encryptionCertificate;
     private $encryptionCertificateFingerprint;
     private $encryptionKeyFingerprint;

@@ -16,6 +16,10 @@ class JsonPath {
     const FIRST_CHILD_KEY = "/(?:\[')([^\[\]]*)(?:'\])/"; // Returns "obj1" for "$['obj1']['obj2']"
     const FIRST_TOKEN_IN_PATH = "/(\['[^\[\]]*'\])/";     // Returns "['obj1']" for "$['obj1']['obj2']"
 
+    private function __construct() {
+        // This class can't be instantiated
+    }
+
     /**
      * Convert the given JSON path to the following form: $['path']['to']['object'].
      * @throws \InvalidArgumentException
@@ -53,7 +57,7 @@ class JsonPath {
         $currentElement = $jsonObject;
         while ($currentPath !== '$') {
             preg_match(self::FIRST_CHILD_KEY, $currentPath, $matches);
-            if (sizeof($matches).isEmpty()) {
+            if (empty($matches)) {
                 return null;
             }
             $childKey = $matches[1];
