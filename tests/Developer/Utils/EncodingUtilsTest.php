@@ -8,7 +8,7 @@ class EncodingUtilsTest extends TestCase {
 
     public function testConstruct_ShouldBePrivate() {
         // GIVEN
-        $class = new ReflectionClass('Mastercard\Developer\Encryption\EncodingUtils');
+        $class = new ReflectionClass('Mastercard\Developer\Utils\EncodingUtils');
         $constructor = $class->getConstructor();
 
         // WHEN

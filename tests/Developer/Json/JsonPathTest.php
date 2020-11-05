@@ -7,7 +7,7 @@ class JsonPathTest extends TestCase {
 
     public function testConstruct_ShouldBePrivate() {
         // GIVEN
-        $class = new ReflectionClass('Mastercard\Developer\Encryption\JsonPath');
+        $class = new ReflectionClass('Mastercard\Developer\Json\JsonPath');
         $constructor = $class->getConstructor();
 
         // WHEN
