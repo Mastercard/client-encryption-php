@@ -6,6 +6,22 @@ use PHPUnit\Framework\TestCase;
 
 class EncodingUtilsTest extends TestCase {
 
+    public function testConstruct_ShouldBePrivate() {
+        // GIVEN
+        $class = new ReflectionClass('Mastercard\Developer\Utils\EncodingUtils');
+        $constructor = $class->getConstructor();
+
+        // WHEN
+        $isPrivate = $constructor->isPrivate();
+
+        // THEN
+        $this->assertTrue($isPrivate);
+
+        // COVERAGE
+        $constructor->setAccessible(true);
+        $constructor->invoke($class->newInstanceWithoutConstructor());
+    }
+
     public function testHexEncode() {
         $this->assertEquals('00', EncodingUtils::hexEncode("\0"));
         $this->assertEquals('736f6d652064617461', EncodingUtils::hexEncode('some data'));

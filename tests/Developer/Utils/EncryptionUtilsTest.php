@@ -5,6 +5,22 @@ use PHPUnit\Framework\TestCase;
 
 class EncryptionUtilsTest extends TestCase {
 
+    public function testConstruct_ShouldBePrivate() {
+        // GIVEN
+        $class = new ReflectionClass('Mastercard\Developer\Utils\EncryptionUtils');
+        $constructor = $class->getConstructor();
+
+        // WHEN
+        $isPrivate = $constructor->isPrivate();
+
+        // THEN
+        $this->assertTrue($isPrivate);
+
+        // COVERAGE
+        $constructor->setAccessible(true);
+        $constructor->invoke($class->newInstanceWithoutConstructor());
+    }
+
     public function testLoadEncryptionCertificate_ShouldSupportPem() {
 
         // GIVEN
