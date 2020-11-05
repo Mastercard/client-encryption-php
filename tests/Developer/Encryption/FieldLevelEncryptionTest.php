@@ -6,6 +6,7 @@ use Mastercard\Developer\Test\TestUtils;
 use Mastercard\Developer\Utils\EncryptionUtils;
 use Mastercard\Developer\Utils\StringUtils;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class FieldLevelEncryptionTest extends TestCase {
 

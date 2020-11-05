@@ -2,6 +2,7 @@
 namespace Mastercard\Developer\Json;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class JsonPathTest extends TestCase {
 

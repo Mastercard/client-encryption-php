@@ -2,6 +2,7 @@
 namespace Mastercard\Developer\Utils;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class EncryptionUtilsTest extends TestCase {
 
