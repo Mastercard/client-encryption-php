@@ -5,6 +5,22 @@ use PHPUnit\Framework\TestCase;
 
 class JsonPathTest extends TestCase {
 
+    public function testConstruct_ShouldBePrivate() {
+        // GIVEN
+        $class = new ReflectionClass('Mastercard\Developer\Encryption\JsonPath');
+        $constructor = $class->getConstructor();
+
+        // WHEN
+        $isPrivate = $constructor->isPrivate();
+
+        // THEN
+        $this->assertTrue($isPrivate);
+
+        // COVERAGE
+        $constructor->setAccessible(true);
+        $constructor->invoke($class->newInstanceWithoutConstructor());
+    }
+
     public function testNormalizePath() {
 
         // GIVEN
@@ -59,7 +75,7 @@ class JsonPathTest extends TestCase {
     }
 
     public function testGetElementKey() {
-        
+
         // GIVEN
         $jsonPath1 = '$[\'obj0\'][\'obj1\'][\'obj2\']';
         $jsonPath2 = 'obj1.obj2';
@@ -220,7 +236,7 @@ class JsonPathTest extends TestCase {
     }
 
     public function testGetParentPath_ShouldThrowInvalidArgumentException_WhenNoParent() {
-        
+
         // GIVEN
         $jsonPath = '$';
 
@@ -233,7 +249,7 @@ class JsonPathTest extends TestCase {
     }
 
     public function testGetElementKey_ShouldThrowInvalidArgumentException_WhenNoKey() {
-        
+
         // GIVEN
         $jsonPath = '$';
 
