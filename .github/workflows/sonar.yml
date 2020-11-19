@@ -1,0 +1,38 @@
+name: Sonar
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: | 
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492.zip
+        unzip sonar-scanner-cli-3.3.0.1492.zip
+        composer --no-plugins --no-scripts install
+        composer --no-plugins --no-scripts dump-autoload -o
+        vendor/bin/phpunit --configuration ./phpunit.xml --teamcity
+    - name: Sonar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: | 
+        sonar-scanner-3.3.0.1492/bin/sonar-scanner \
+          -Dsonar.projectName=client-encryption-php \
+          -Dsonar.projectKey=Mastercard_client-encryption-php \
+          -Dsonar.organization=mastercard \
+          -Dsonar.sources=./src \
+          -Dsonar.tests=./tests \
+          -Dsonar.exclusions=**/vendor/**,**/tests/**,**/*.xml \
+          -Dsonar.php.tests.reportPath=tests.xml \
+          -Dsonar.php.coverage.reportPaths=coverage.xml \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=$SONAR_TOKEN
