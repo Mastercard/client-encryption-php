@@ -1,6 +1,6 @@
 # client-encryption-php
 
-[![](https://travis-ci.org/Mastercard/client-encryption-php.svg?branch=master)](https://travis-ci.org/Mastercard/client-encryption-php)
+[![](https://github.com/Mastercard/client-encryption-php/workflows/Build%20&%20Test/badge.svg)](https://github.com/Mastercard/client-encryption-php/actions?query=workflow%3A%22Build+%26+Test%22)
 [![](https://sonarcloud.io/api/project_badges/measure?project=Mastercard_client-encryption-php&metric=alert_status)](https://sonarcloud.io/dashboard?id=Mastercard_client-encryption-php)
 [![](https://github.com/Mastercard/client-encryption-php/workflows/broken%20links%3F/badge.svg)](https://github.com/Mastercard/client-encryption-php/actions?query=workflow%3A%22broken+links%3F%22)
 [![](https://img.shields.io/packagist/v/mastercard/client-encryption.svg)](https://packagist.org/packages/mastercard/client-encryption)
