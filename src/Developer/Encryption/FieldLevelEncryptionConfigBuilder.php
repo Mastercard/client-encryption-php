@@ -39,13 +39,16 @@ class FieldLevelEncryptionConfigBuilder {
 
     /**
      * Get an instance of the builder.
+     * @return self
      */
     public static function aFieldLevelEncryptionConfig() {
         return new FieldLevelEncryptionConfigBuilder();
     }
 
     /**
+     * @param resource $encryptionCertificate
      * @see FieldLevelEncryptionConfig::encryptionCertificate.
+     * @return $this
      */
     public function withEncryptionCertificate($encryptionCertificate) {
         $this->encryptionCertificate = $encryptionCertificate;
@@ -53,7 +56,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $encryptionCertificateFingerprint
      * @see FieldLevelEncryptionConfig::encryptionCertificateFingerprint.
+     * @return $this
      */
     public function withEncryptionCertificateFingerprint($encryptionCertificateFingerprint) {
         $this->encryptionCertificateFingerprint = $encryptionCertificateFingerprint;
@@ -61,7 +66,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $encryptionKeyFingerprint
      * @see FieldLevelEncryptionConfig::encryptionKeyFingerprint.
+     * @return $this
      */
     public function withEncryptionKeyFingerprint($encryptionKeyFingerprint) {
         $this->encryptionKeyFingerprint = $encryptionKeyFingerprint;
@@ -69,7 +76,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param resource $decryptionKey
      * @see FieldLevelEncryptionConfig::decryptionKey.
+     * @return $this
      */
     public function withDecryptionKey($decryptionKey) {
         $this->decryptionKey = $decryptionKey;
@@ -77,7 +86,10 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $jsonPathIn
+     * @param string $jsonPathOut
      * @see FieldLevelEncryptionConfig::encryptionPaths.
+     * @return $this
      */
     public function withEncryptionPath($jsonPathIn, $jsonPathOut) {
         $this->encryptionPaths[$jsonPathIn] = $jsonPathOut;
@@ -85,7 +97,10 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $jsonPathIn
+     * @param string $jsonPathOut
      * @see FieldLevelEncryptionConfig::decryptionPaths.
+     * @return $this
      */
     public function withDecryptionPath($jsonPathIn, $jsonPathOut) {
         $this->decryptionPaths[$jsonPathIn] = $jsonPathOut;
@@ -93,7 +108,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $oaepPaddingDigestAlgorithm
      * @see FieldLevelEncryptionConfig::oaepPaddingDigestAlgorithm.
+     * @return $this
      */
     public function withOaepPaddingDigestAlgorithm($oaepPaddingDigestAlgorithm) {
         $this->oaepPaddingDigestAlgorithm = $oaepPaddingDigestAlgorithm;
@@ -101,7 +118,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string|null $ivFieldName
      * @see FieldLevelEncryptionConfig::ivFieldName.
+     * @return $this
      */
     public function withIvFieldName($ivFieldName) {
         $this->ivFieldName = $ivFieldName;
@@ -109,7 +128,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string|null $oaepPaddingDigestAlgorithmFieldName
      * @see FieldLevelEncryptionConfig::oaepPaddingDigestAlgorithmFieldName.
+     * @return $this
      */
     public function withOaepPaddingDigestAlgorithmFieldName($oaepPaddingDigestAlgorithmFieldName) {
         $this->oaepPaddingDigestAlgorithmFieldName = $oaepPaddingDigestAlgorithmFieldName;
@@ -117,7 +138,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string|null $encryptedKeyFieldName
      * @see FieldLevelEncryptionConfig::encryptedKeyFieldName.
+     * @return $this
      */
     public function withEncryptedKeyFieldName($encryptedKeyFieldName) {
         $this->encryptedKeyFieldName = $encryptedKeyFieldName;
@@ -125,7 +148,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $encryptedValueFieldName
      * @see FieldLevelEncryptionConfig::encryptedValueFieldName.
+     * @return $this
      */
     public function withEncryptedValueFieldName($encryptedValueFieldName) {
         $this->encryptedValueFieldName = $encryptedValueFieldName;
@@ -133,7 +158,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string|null $encryptionCertificateFingerprintFieldName
      * @see FieldLevelEncryptionConfig::encryptionCertificateFingerprintFieldName.
+     * @return $this
      */
     public function withEncryptionCertificateFingerprintFieldName($encryptionCertificateFingerprintFieldName) {
         $this->encryptionCertificateFingerprintFieldName = $encryptionCertificateFingerprintFieldName;
@@ -141,7 +168,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string|null $encryptionKeyFingerprintFieldName
      * @see FieldLevelEncryptionConfig::encryptionKeyFingerprintFieldName.
+     * @return $this
      */
     public function withEncryptionKeyFingerprintFieldName($encryptionKeyFingerprintFieldName) {
         $this->encryptionKeyFingerprintFieldName = $encryptionKeyFingerprintFieldName;
@@ -149,7 +178,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param int $fieldValueEncoding
      * @see FieldLevelEncryptionConfig::fieldValueEncoding.
+     * @return $this
      */
     public function withFieldValueEncoding($fieldValueEncoding) {
         $this->fieldValueEncoding = $fieldValueEncoding;
@@ -157,7 +188,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $ivHeaderName
      * @see FieldLevelEncryptionConfig::ivHeaderName.
+     * @return $this
      */
     public function withIvHeaderName($ivHeaderName) {
         $this->ivHeaderName = $ivHeaderName;
@@ -165,7 +198,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $oaepPaddingDigestAlgorithmHeaderName
      * @see FieldLevelEncryptionConfig::oaepPaddingDigestAlgorithmHeaderName.
+     * @return $this
      */
     public function withOaepPaddingDigestAlgorithmHeaderName($oaepPaddingDigestAlgorithmHeaderName) {
         $this->oaepPaddingDigestAlgorithmHeaderName = $oaepPaddingDigestAlgorithmHeaderName;
@@ -173,7 +208,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $encryptedKeyHeaderName
      * @see FieldLevelEncryptionConfig::encryptedKeyHeaderName.
+     * @return $this
      */
     public function withEncryptedKeyHeaderName($encryptedKeyHeaderName) {
         $this->encryptedKeyHeaderName = $encryptedKeyHeaderName;
@@ -181,7 +218,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $encryptionCertificateFingerprintHeaderName
      * @see FieldLevelEncryptionConfig::encryptionCertificateFingerprintHeaderName.
+     * @return $this
      */
     public function withEncryptionCertificateFingerprintHeaderName($encryptionCertificateFingerprintHeaderName) {
         $this->encryptionCertificateFingerprintHeaderName = $encryptionCertificateFingerprintHeaderName;
@@ -189,7 +228,9 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
+     * @param string $encryptionKeyFingerprintHeaderName
      * @see FieldLevelEncryptionConfig::encryptionKeyFingerprintHeaderName.
+     * @return $this
      */
     public function withEncryptionKeyFingerprintHeaderName($encryptionKeyFingerprintHeaderName) {
         $this->encryptionKeyFingerprintHeaderName = $encryptionKeyFingerprintHeaderName;
@@ -199,7 +240,9 @@ class FieldLevelEncryptionConfigBuilder {
     /**
      * Build a FieldLevelEncryptionConfig.
      * @see FieldLevelEncryptionConfig
-     * @throws EncryptionException, InvalidArgumentException
+     * @throws EncryptionException
+     * @throws \InvalidArgumentException
+     * @return FieldLevelEncryptionConfig
      */
     public function build() {
 
@@ -233,6 +276,9 @@ class FieldLevelEncryptionConfigBuilder {
         );
     }
 
+    /**
+     * @throws \InvalidArgumentException
+     */
     private function checkJsonPathParameterValues() {
         foreach ($this->decryptionPaths as $jsonPathIn => $jsonPathOut) {
             if (!JsonPath::isPathDefinite($jsonPathIn) || !JsonPath::isPathDefinite($jsonPathOut)) {
@@ -246,6 +292,9 @@ class FieldLevelEncryptionConfigBuilder {
         }
     }
 
+    /**
+     * @throws \InvalidArgumentException
+     */
     private function checkParameterValues() {
         if (empty($this->oaepPaddingDigestAlgorithm)) {
             throw new \InvalidArgumentException('The digest algorithm for OAEP cannot be empty!');
@@ -272,6 +321,9 @@ class FieldLevelEncryptionConfigBuilder {
         }
     }
 
+    /**
+     * @throws \InvalidArgumentException
+     */
     private function checkParameterConsistency () {
         if (!empty($this->decryptionPaths) && empty($this->decryptionKey)) {
             throw new \InvalidArgumentException('Can\'t decrypt without decryption key!');
@@ -292,6 +344,9 @@ class FieldLevelEncryptionConfigBuilder {
         }
     }
 
+    /**
+     * @throws EncryptionException
+     */
     private function computeEncryptionCertificateFingerprintWhenNeeded() {
         $providedEncryptionCertificate = $this->encryptionCertificate;
         if (empty($providedEncryptionCertificate) || !empty($this->encryptionCertificateFingerprint)) {
@@ -305,6 +360,9 @@ class FieldLevelEncryptionConfigBuilder {
         }
     }
 
+    /**
+     * @throws EncryptionException
+     */
     private function computeEncryptionKeyFingerprintWhenNeeded() {
         $providedEncryptionCertificate = $this->encryptionCertificate;
         if (empty($providedEncryptionCertificate) || !empty($this->encryptionKeyFingerprint)) {
