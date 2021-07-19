@@ -6,7 +6,7 @@ use Mastercard\Developer\Utils\StringUtils;
 /**
  * A very basic implementation of JSON Path which handles simple paths like: "$", "$.path.to.object",
  * "$['path']['to']['object']", "path.to.object".
- * @link https://goessner.net/articles/JsonPath/
+ * @see https://goessner.net/articles/JsonPath/
  * @package Mastercard\Developer\Json
  */
 class JsonPath {
@@ -22,6 +22,8 @@ class JsonPath {
 
     /**
      * Convert the given JSON path to the following form: $['path']['to']['object'].
+     * @param string|null
+     * @return string
      * @throws \InvalidArgumentException
      */
     static function normalizePath($path) {
@@ -45,6 +47,9 @@ class JsonPath {
 
     /**
      * Return the element at the given path, return null if not found.
+     * @param \stdClass   $jsonObject
+     * @param string|null $path
+     * @return mixed
      * @throws \InvalidArgumentException
      */
     static function find($jsonObject, $path) {
@@ -72,6 +77,8 @@ class JsonPath {
 
     /**
      * Delete the element at the given path.
+     * @param \stdClass   $jsonObject
+     * @param string|null $path
      * @throws \InvalidArgumentException
      */
     static function delete($jsonObject, $path) {
@@ -88,6 +95,9 @@ class JsonPath {
      * Get JSON path to the parent of the object at the given JSON path. Example:
      * - Input: "$.['path'].['to'].['object']"
      * - Output: "$.['path'].['to']"
+     * @param string|null $path
+     * @return string
+     * @throws \InvalidArgumentException
      */
     static function getParentPath($path) {
         if ('$' === $path) {
@@ -108,6 +118,9 @@ class JsonPath {
      * Get object key at the given JSON path. Example:
      * - Input: "$.['path'].['to'].['object']"
      * - Output: "object"
+     * @param string|null $path
+     * @return string
+     * @throws \InvalidArgumentException
      */
     static function getElementKey($path) {
         if ('$' === $path) {
@@ -126,7 +139,10 @@ class JsonPath {
 
     /**
      * Checks if a JSON path points to a single item or if it potentially returns multiple items.
-     * @link https://github.com/json-path/JsonPath
+     * @see https://github.com/json-path/JsonPath
+     * @param string|null $path
+     * @return bool
+     * @throws \InvalidArgumentException
      */
     static function isPathDefinite($path) {
         return strpos($path, '*') === false && strpos($path, '..') === false

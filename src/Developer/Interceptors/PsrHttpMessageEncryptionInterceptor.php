@@ -3,7 +3,9 @@ namespace Mastercard\Developer\Interceptors;
 
 use Mastercard\Developer\Encryption\EncryptionException;
 use Mastercard\Developer\Encryption\FieldLevelEncryption;
+use Mastercard\Developer\Encryption\FieldLevelEncryptionConfig;
 use Mastercard\Developer\Encryption\FieldLevelEncryptionParams;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -12,12 +14,14 @@ use Psr\Http\Message\ResponseInterface;
  * @package Mastercard\Developer\Interceptors
  */
 class PsrHttpMessageEncryptionInterceptor {
-
+    /**
+     * @var FieldLevelEncryptionConfig
+     */
     private $config;
 
     /**
      * PsrHttpMessageEncryptionInterceptor constructor.
-     * @param $config A FieldLevelEncryptionConfig instance
+     * @param FieldLevelEncryptionConfig $config A FieldLevelEncryptionConfig instance
      */
     public function __construct($config) {
         $this->config = $config;
@@ -25,8 +29,8 @@ class PsrHttpMessageEncryptionInterceptor {
 
     /**
      * Encrypt payloads from RequestInterface objects when needed.
-     * @param $request A RequestInterface object
-     * @return The updated RequestInterface object
+     * @param RequestInterface $request A RequestInterface object
+     * @return RequestInterface The updated RequestInterface object
      * @throws EncryptionException
      */
     public function interceptRequest(RequestInterface &$request) {
@@ -70,8 +74,8 @@ class PsrHttpMessageEncryptionInterceptor {
 
     /**
      * Decrypt payloads from ResponseInterface objects when needed.
-     * @param $response A ResponseInterface object
-     * @return The updated ResponseInterface object
+     * @param ResponseInterface $response A ResponseInterface object
+     * @return ResponseInterface The updated ResponseInterface object
      * @throws EncryptionException
      */
     public function interceptResponse(ResponseInterface &$response) {
@@ -113,6 +117,11 @@ class PsrHttpMessageEncryptionInterceptor {
         }
     }
 
+    /**
+     * @param MessageInterface $message
+     * @param string           $name
+     * @param string           $value
+     */
     private static function updateHeader(&$message, $name, $value) {
         if (empty($name)) {
             // Do nothing
@@ -121,6 +130,12 @@ class PsrHttpMessageEncryptionInterceptor {
         $message = $message->withHeader($name, $value);
     }
 
+    /**
+     * @param MessageInterface $message
+     * @param string           $name
+     *
+     * @return string|null
+     */
     private static function readAndRemoveHeader(&$message, $name) {
         if (empty($name)) {
             return null;

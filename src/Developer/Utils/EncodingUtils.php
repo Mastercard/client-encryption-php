@@ -9,14 +9,31 @@ class EncodingUtils {
         // This class can't be instantiated
     }
 
+    /**
+     * @param string|null $bytes
+     * @param int         $encoding
+     * @return string
+     * @throws \InvalidArgumentException
+     */
     static function encodeBytes($bytes, $encoding) {
         return $encoding === FieldValueEncoding::HEX ? self::hexEncode($bytes) : base64_encode($bytes);
     }
 
+    /**
+     * @param string|null $value
+     * @param int         $encoding
+     * @return string|false
+     * @throws \InvalidArgumentException
+     */
     static function decodeValue($value, $encoding) {
         return $encoding === FieldValueEncoding::HEX ? self::hexDecode($value) : base64_decode($value);
     }
 
+    /**
+     * @param string|null $bytes
+     * @return string
+     * @throws \InvalidArgumentException
+     */
     static function hexEncode($bytes) {
         if ('' === $bytes) {
             return '';
@@ -27,6 +44,11 @@ class EncodingUtils {
         return bin2hex($bytes);
     }
 
+    /**
+     * @param string|null $value
+     * @return string|false
+     * @throws \InvalidArgumentException
+     */
     static function hexDecode($value) {
         if ('' === $value) {
             return '';
@@ -40,10 +62,22 @@ class EncodingUtils {
         return hex2bin($value);
     }
 
+    /**
+     * @param string $der
+     * @param string $header
+     * @param string $footer
+     * @return string
+     */
     static function derToPem($der, $header, $footer) {
         return $header . "\r\n". chunk_split(base64_encode($der), 64, "\r\n") . $footer;
     }
 
+    /**
+     * @param string $pem
+     * @param string $header
+     * @param string $footer
+     * @return string|false
+     */
     static function pemToDer($pem, $header, $footer) {
         $der = str_replace($header, '', $pem);
         $der = str_replace($footer, '', $der);

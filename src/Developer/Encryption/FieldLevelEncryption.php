@@ -18,12 +18,12 @@ class FieldLevelEncryption {
 
     /**
      * Encrypt parts of a JSON payload using the given parameters and configuration.
-     * @param $payload A JSON string
-     * @param $config A FieldLevelEncryptionConfig instance
-     * @param $params A FieldLevelEncryptionParams instance
+     * @param string                          $payload A JSON string
+     * @param FieldLevelEncryptionConfig      $config  A FieldLevelEncryptionConfig instance
+     * @param FieldLevelEncryptionParams|null $params  A FieldLevelEncryptionParams instance
      * @see FieldLevelEncryptionConfig
      * @see FieldLevelEncryptionParams
-     * @return The updated payload
+     * @return string The updated payload
      * @throws EncryptionException
      */
     public static function encryptPayload($payload, $config, $params = null) {
@@ -49,12 +49,12 @@ class FieldLevelEncryption {
 
     /**
      * Decrypt parts of a JSON payload using the given parameters and configuration.
-     * @param $payload A JSON string
-     * @param $config A FieldLevelEncryptionConfig instance
-     * @param $params A FieldLevelEncryptionParams instance
+     * @param string                          $payload A JSON string
+     * @param FieldLevelEncryptionConfig      $config  A FieldLevelEncryptionConfig instance
+     * @param FieldLevelEncryptionParams|null $params  A FieldLevelEncryptionParams instance
      * @see FieldLevelEncryptionConfig
      * @see FieldLevelEncryptionParams
-     * @return The updated payload
+     * @return string The updated payload
      * @throws EncryptionException
      */
     public static function decryptPayload($payload, $config, $params = null) {
@@ -79,6 +79,11 @@ class FieldLevelEncryption {
     }
 
     /**
+     * @param \stdClass                       $payloadJsonObject
+     * @param string                          $jsonPathIn
+     * @param string                          $jsonPathOut
+     * @param FieldLevelEncryptionConfig      $config
+     * @param FieldLevelEncryptionParams|null $params
      * @throws EncryptionException
      */
     private static function encryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params) {
@@ -130,6 +135,11 @@ class FieldLevelEncryption {
     }
 
     /**
+     * @param \stdClass                       $payloadJsonObject
+     * @param string                          $jsonPathIn
+     * @param string                          $jsonPathOut
+     * @param FieldLevelEncryptionConfig      $config
+     * @param FieldLevelEncryptionParams|null $params
      * @throws EncryptionException
      */
     private static function decryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params) {
@@ -178,6 +188,12 @@ class FieldLevelEncryption {
         }
     }
 
+    /**
+     * @param \stdClass $payloadJsonObject
+     * @param string    $jsonPathOut
+     * @param \stdClass $outJsonObject
+     * @param mixed     $decryptedValue
+     */
     private static function addDecryptedDataToPayload($payloadJsonObject, $jsonPathOut, $outJsonObject, $decryptedValue) {
         $decryptedValueJsonElement = json_decode($decryptedValue);
         if (is_null($decryptedValueJsonElement)) {
@@ -199,10 +215,21 @@ class FieldLevelEncryption {
         }
     }
 
+    /**
+     * @param \stdClass $payloadJsonObject
+     * @param string    $jsonPath
+     * @return mixed
+     */
     private static function readJsonElement($payloadJsonObject, $jsonPath) {
         return JsonPath::find($payloadJsonObject, $jsonPath);
     }
 
+    /**
+     * @param \stdClass $payloadJsonObject
+     * @param string    $jsonPath
+     * @throws \InvalidArgumentException
+     * @return mixed
+     */
     private static function readJsonObject($payloadJsonObject, $jsonPath) {
         $inJsonElement = self::readJsonElement($payloadJsonObject, $jsonPath);
         if (is_null($inJsonElement)) {
@@ -214,6 +241,12 @@ class FieldLevelEncryption {
         return $inJsonElement;
     }
 
+    /**
+     * @param \stdClass $payloadJsonObject
+     * @param string    $jsonPathOut
+     * @throws \InvalidArgumentException
+     * @return mixed
+     */
     private static function checkOrCreateOutObject($payloadJsonObject, $jsonPathOut) {
         $outJsonObject = self::readJsonObject($payloadJsonObject, $jsonPathOut);
         if (!is_null($outJsonObject)) {
@@ -232,6 +265,11 @@ class FieldLevelEncryption {
         return $parentJsonObject->$elementKey;
     }
 
+    /**
+     * @param \stdClass $object
+     * @param string    $key
+     * @return mixed
+     */
     private static function readAndDeleteJsonKey($object, $key) {
         if (empty($key) || false === property_exists($object, $key)) {
             // Do nothing
@@ -242,6 +280,13 @@ class FieldLevelEncryption {
         return $value;
     }
 
+    /**
+     * @param string $key
+     * @param string $iv
+     * @param string $bytes
+     * @throws EncryptionException
+     * @return string
+     */
     private static function encryptBytes($key, $iv, $bytes) {
         $aes = new AES();
         $aes->setKey($key);
@@ -253,6 +298,13 @@ class FieldLevelEncryption {
         return $encryptedBytes;
     }
 
+    /**
+     * @param string $key
+     * @param string $iv
+     * @param string $encryptedBytes
+     * @throws EncryptionException
+     * @return string
+     */
     private static function decryptBytes($key, $iv, $encryptedBytes) {
         $aes = new AES();
         $aes->setKey($key);
@@ -264,6 +316,10 @@ class FieldLevelEncryption {
         return $bytes;
     }
 
+    /**
+     * @param mixed $object
+     * @return mixed
+     */
     private static function toJsonString($object) {
         if (is_null($object)) {
             throw new \InvalidArgumentException('Can\'t get a JSON string from a null object!');
@@ -274,6 +330,10 @@ class FieldLevelEncryption {
         return json_encode($object);
     }
 
+    /**
+     * @param string $json
+     * @return string
+     */
     private static function sanitizeJson($json) {
         $json = str_replace("\n", '', $json);
         $json = str_replace("\r", '', $json);

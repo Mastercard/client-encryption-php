@@ -20,6 +20,12 @@ class FieldLevelEncryptionParams {
     private $secretKey;
     private $iv;
 
+    /**
+     * @param FieldLevelEncryptionConfig $config
+     * @param string|null $ivValue
+     * @param string|null $encryptedKeyValue
+     * @param null $oaepPaddingDigestAlgorithmValue
+     */
     public function __construct($config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue = null) {
         $this->ivValue = $ivValue;
         $this->encryptedKeyValue = $encryptedKeyValue;
@@ -29,7 +35,7 @@ class FieldLevelEncryptionParams {
 
     /**
      * Generate encryption parameters.
-     * @param $config A FieldLevelEncryptionConfig instance
+     * @param FieldLevelEncryptionConfig $config A FieldLevelEncryptionConfig instance
      * @return FieldLevelEncryptionParams
      * @throws EncryptionException
      */
@@ -56,6 +62,9 @@ class FieldLevelEncryptionParams {
         return $params;
     }
 
+    /**
+     * @return string
+     */
     public function getIvValue() {
         return $this->ivValue;
     }

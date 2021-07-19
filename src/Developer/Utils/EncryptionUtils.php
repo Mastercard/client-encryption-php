@@ -20,6 +20,8 @@ class EncryptionUtils {
 
     /**
      * Create an X.509 resource from the certificate data at the given file path.
+     * @param string $certificatePath
+     * @return resource
      * @throws \InvalidArgumentException
      */
     public static function loadEncryptionCertificate($certificatePath) {
@@ -36,6 +38,10 @@ class EncryptionUtils {
 
     /**
      * Create a RSA decryption key resource from a key inside a PKCS#12 container or from an encrypted key file (PEM or DER).
+     * @param string      $pkcs12KeyFileOrKeyFilePath
+     * @param string|null $pkcs12DecryptionKeyAlias
+     * @param string|null $pkcs12DecryptionKeyPassword
+     * @return resource|false
      * @throws \InvalidArgumentException
      */
     public static function loadDecryptionKey($pkcs12KeyFileOrKeyFilePath, $pkcs12DecryptionKeyAlias = null, $pkcs12DecryptionKeyPassword = null) {
@@ -46,6 +52,13 @@ class EncryptionUtils {
         }
     }
 
+    /**
+     * @param string $pkcs12KeyFilePath
+     * @param string $decryptionKeyAlias
+     * @param string $decryptionKeyPassword
+     * @return resource|false
+     * @throws \InvalidArgumentException
+     */
     private static function loadKeyFromPkcs12($pkcs12KeyFilePath, $decryptionKeyAlias, $decryptionKeyPassword) { //NOSONAR
         $keystoreData = self::readFileContent($pkcs12KeyFilePath);
         openssl_pkcs12_read($keystoreData, $certs, $decryptionKeyPassword);
@@ -56,6 +69,11 @@ class EncryptionUtils {
         return openssl_pkey_get_private($certs['pkey']);
     }
 
+    /**
+     * @param string $keyFilePath
+     * @return resource|false
+     * @throws \InvalidArgumentException
+     */
     private static function loadKeyFromUnencryptedFile($keyFilePath) {
         $keyData = self::readFileContent($keyFilePath);
         if (strpos($keyData, self::PKCS_1_PEM_HEADER) !== FALSE || strpos($keyData, self::PKCS_8_PEM_HEADER) !== FALSE) {
@@ -68,6 +86,11 @@ class EncryptionUtils {
         return openssl_pkey_get_private($pkcs8Pem);
     }
 
+    /**
+     * @param string $path
+     * @return string|false
+     * @throws \InvalidArgumentException
+     */
     private static function readFileContent($path) {
         try {
             return file_get_contents($path);
