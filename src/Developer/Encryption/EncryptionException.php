@@ -3,10 +3,14 @@
 namespace Mastercard\Developer\Encryption;
 
 use Exception;
+use Throwable;
 
 class EncryptionException extends Exception {
-
-    public function __construct($message = "", Exception $previous = null) {
+    /**
+     * @param string                   $message
+     * @param Exception|Throwable|null $previous
+     */
+    public function __construct($message = "", $previous = null) {
         parent::__construct($message, 0, $previous);
     }
 }

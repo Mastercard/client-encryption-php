@@ -2,13 +2,12 @@
 
 namespace Mastercard\Developer\Interceptors;
 
-use PHPUnit\Framework\TestCase;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase; // can be removed when the minimum supported PHP version will be 7.1+
 
 class PsrStreamInterfaceImplTest extends TestCase {
-
     private $instanceUnderTest;
 
-    protected function setUp() {
+    protected function set_up() { // can be changed to `setUp(): void {` when the minimum supported PHP version will be 7.1+
         $this->instanceUnderTest = new PsrStreamInterfaceImpl();
         $this->instanceUnderTest->write('content');
     }
