@@ -26,7 +26,7 @@ class FieldLevelEncryptionParams {
      * @param FieldLevelEncryptionConfig $config
      * @param string|null $ivValue
      * @param string|null $encryptedKeyValue
-     * @param null $oaepPaddingDigestAlgorithmValue
+     * @param string|null $oaepPaddingDigestAlgorithmValue
      */
     public function __construct($config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue = null) {
         $this->ivValue = $ivValue;
@@ -65,21 +65,28 @@ class FieldLevelEncryptionParams {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIvValue() {
         return $this->ivValue;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEncryptedKeyValue() {
         return $this->encryptedKeyValue;
     }
 
+    /**
+     * @return string|null
+     */
     public function getOaepPaddingDigestAlgorithmValue() {
         return $this->oaepPaddingDigestAlgorithmValue;
     }
 
     /**
+     * @return string|false
      * @throws EncryptionException
      */
     public function getIvBytes() {
@@ -96,6 +103,7 @@ class FieldLevelEncryptionParams {
     }
 
     /**
+     * @return string
      * @throws EncryptionException
      */
     public function getSecretKeyBytes() {
@@ -115,6 +123,9 @@ class FieldLevelEncryptionParams {
     }
 
     /**
+     * @param FieldLevelEncryptionConfig $config
+     * @param string                     $keyBytes
+     * @return string
      * @throws EncryptionException
      */
     private static function wrapSecretKey($config, $keyBytes) {
@@ -131,6 +142,10 @@ class FieldLevelEncryptionParams {
     }
 
     /**
+     * @param FieldLevelEncryptionConfig $config
+     * @param string                     $wrappedKeyBytes
+     * @param string                     $oaepPaddingDigestAlgorithm
+     * @return string
      * @throws EncryptionException
      */
     private static function unwrapSecretKey($config, $wrappedKeyBytes, $oaepPaddingDigestAlgorithm) {
@@ -144,6 +159,12 @@ class FieldLevelEncryptionParams {
         }
     }
 
+    /**
+     * @param string    $oaepPaddingDigestAlgorithm
+     * @param string    $key
+     * @param int|false $type
+     * @return RSA
+     */
     private static function getRsa($oaepPaddingDigestAlgorithm, $key, $type) {
         $rsa = new RSA();
         $rsa->setEncryptionMode(RSA::ENCRYPTION_OAEP);
@@ -154,6 +175,10 @@ class FieldLevelEncryptionParams {
         return $rsa;
     }
 
+    /**
+     * @param array $raw
+     * @return string
+     */
     private static function toDsigXmlPrivateKey($raw) {
         return "<RSAKeyValue>\r\n" .
             '  <Modulus>' . base64_encode($raw['n']) . "</Modulus>\r\n" .

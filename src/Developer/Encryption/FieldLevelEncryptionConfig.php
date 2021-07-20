@@ -2,6 +2,9 @@
 
 namespace Mastercard\Developer\Encryption;
 
+use OpenSSLAsymmetricKey;
+use OpenSSLCertificate;
+
 /**
  * A class for storing the encryption/decryption configuration.
  * @package Mastercard\Developer\Encryption
@@ -10,7 +13,7 @@ class FieldLevelEncryptionConfig {
 
     /**
      * A certificate object whose public key will be used for encryption.
-     * @var resource
+     * @var OpenSSLCertificate|resource|string
      */
     private $encryptionCertificate;
 
@@ -32,7 +35,7 @@ class FieldLevelEncryptionConfig {
 
     /**
      * A private key object to be used for decryption.
-     * @var resource
+     * @var OpenSSLAsymmetricKey|resource
      */
     private $decryptionKey;
 
@@ -161,25 +164,26 @@ class FieldLevelEncryptionConfig {
 
     /**
      * FieldLevelEncryptionConfig constructor.
-     * @param resource    $encryptionCertificate
-     * @param string      $encryptionCertificateFingerprint
-     * @param string      $encryptionKeyFingerprint
-     * @param resource    $decryptionKey
-     * @param array       $encryptionPaths
-     * @param array       $decryptionPaths
-     * @param string      $oaepPaddingDigestAlgorithm
-     * @param string|null $oaepPaddingDigestAlgorithmFieldName
-     * @param string|null $oaepPaddingDigestAlgorithmHeaderName
-     * @param string|null $ivFieldName
-     * @param string|null $ivHeaderName
-     * @param string|null $encryptedKeyFieldName
-     * @param string|null $encryptedKeyHeaderName
-     * @param string|null $encryptedValueFieldName
-     * @param string|null $encryptionCertificateFingerprintFieldName
-     * @param string|null $encryptionCertificateFingerprintHeaderName
-     * @param string|null $encryptionKeyFingerprintFieldName
-     * @param string|null $encryptionKeyFingerprintHeaderName
-     * @param int         $fieldValueEncoding
+     *
+     * @param OpenSSLCertificate|resource|string $encryptionCertificate
+     * @param string                             $encryptionCertificateFingerprint
+     * @param string                             $encryptionKeyFingerprint
+     * @param OpenSSLAsymmetricKey|resource      $decryptionKey
+     * @param array                              $encryptionPaths
+     * @param array                              $decryptionPaths
+     * @param string                             $oaepPaddingDigestAlgorithm
+     * @param string|null                        $oaepPaddingDigestAlgorithmFieldName
+     * @param string|null                        $oaepPaddingDigestAlgorithmHeaderName
+     * @param string|null                        $ivFieldName
+     * @param string|null                        $ivHeaderName
+     * @param string|null                        $encryptedKeyFieldName
+     * @param string|null                        $encryptedKeyHeaderName
+     * @param string|null                        $encryptedValueFieldName
+     * @param string|null                        $encryptionCertificateFingerprintFieldName
+     * @param string|null                        $encryptionCertificateFingerprintHeaderName
+     * @param string|null                        $encryptionKeyFingerprintFieldName
+     * @param string|null                        $encryptionKeyFingerprintHeaderName
+     * @param int                                $fieldValueEncoding
      */
     public function __construct($encryptionCertificate, $encryptionCertificateFingerprint, $encryptionKeyFingerprint, $decryptionKey, $encryptionPaths, $decryptionPaths, $oaepPaddingDigestAlgorithm, $oaepPaddingDigestAlgorithmFieldName, $oaepPaddingDigestAlgorithmHeaderName, $ivFieldName, $ivHeaderName, $encryptedKeyFieldName, $encryptedKeyHeaderName, $encryptedValueFieldName, $encryptionCertificateFingerprintFieldName, $encryptionCertificateFingerprintHeaderName, $encryptionKeyFingerprintFieldName, $encryptionKeyFingerprintHeaderName, $fieldValueEncoding) {
         $this->encryptionCertificate = $encryptionCertificate;
@@ -204,7 +208,7 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return resource
+     * @return OpenSSLCertificate|resource|string
      */
     public function getEncryptionCertificate() {
         return $this->encryptionCertificate;
@@ -225,7 +229,7 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return resource
+     * @return OpenSSLAsymmetricKey|resource
      */
     public function getDecryptionKey() {
         return $this->decryptionKey;
