@@ -20,7 +20,7 @@ class TestUtils {
     }
 
     public static function getTestEncryptionCertificate() {
-        return EncryptionUtils::loadEncryptionCertificate(dirname(__DIR__, 3).'/resources/Certificates/test_certificate-2048.pem');
+        return EncryptionUtils::loadEncryptionCertificate(dirname(dirname(dirname(__DIR__))).'/resources/Certificates/test_certificate-2048.pem');
     }
 
     public static function getTestInvalidEncryptionCertificate() {
@@ -28,7 +28,7 @@ class TestUtils {
     }
 
     public static function getTestDecryptionKey() {
-        return EncryptionUtils::loadDecryptionKey(dirname(__DIR__, 3).'/resources/Keys/Pkcs8/test_key_pkcs8-2048.der');
+        return EncryptionUtils::loadDecryptionKey(dirname(dirname(dirname(__DIR__))).'/resources/Keys/Pkcs8/test_key_pkcs8-2048.der');
     }
 
     public static function getTestFieldLevelEncryptionConfigBuilder() {
