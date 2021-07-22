@@ -1,6 +1,8 @@
 <?php
 namespace Mastercard\Developer\Utils;
 
+use InvalidArgumentException;
+use Mastercard\Developer\Encryption\EncryptionException;
 use Mastercard\Developer\Encryption\FieldLevelEncryptionConfigBuilder;
 use Mastercard\Developer\Encryption\FieldValueEncoding;
 use Mastercard\Developer\Test\TestUtils;
@@ -63,8 +65,17 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
         $this->assertEquals('80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279', $config->getEncryptionCertificateFingerprint());
     }
 
+    public function testBuild_ShouldThrowEncryptionException_WhenFingerprintCanNotBeCalculated() {
+        $this->expectException(EncryptionException::class);
+        $this->expectExceptionMessage('Failed to compute encryption certificate fingerprint!');
+        TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withEncryptionCertificateFingerprint(null)
+            ->withEncryptionCertificate('not a certificate')
+            ->build();
+    }
+
     public function testBuild_ShouldThrowInvalidArgumentException_WhenNotDefiniteDecryptionPath() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('JSON paths for decryption must point to a single item!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withDecryptionPath('$.encryptedPayloads[*]', '$.payload')
@@ -73,7 +84,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenMissingDecryptionKey() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Can\'t decrypt without decryption key!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withDecryptionPath('$.encryptedPayload', '$.payload')
@@ -86,7 +97,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenNotDefiniteEncryptionPath() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('JSON paths for encryption must point to a single item!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withEncryptionPath('$.payloads[*]', '$.encryptedPayload')
@@ -95,7 +106,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenMissingEncryptionCertificate() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Can\'t encrypt without encryption key!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withEncryptionPath('$.payload', '$.encryptedPayload')
@@ -108,7 +119,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenMissingOaepPaddingDigestAlgorithm() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The digest algorithm for OAEP cannot be empty!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withEncryptedValueFieldName('encryptedValue')
@@ -119,7 +130,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenUnsupportedOaepPaddingDigestAlgorithm() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported OAEP digest algorithm: SHA-720!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withOaepPaddingDigestAlgorithm('SHA-720')
@@ -127,7 +138,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenMissingEncryptedValueFieldName() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Encrypted value field name cannot be empty!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withOaepPaddingDigestAlgorithm('SHA-512')
@@ -138,7 +149,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenMissingBothEncryptedKeyFieldNameAndHeaderName() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('At least one of encrypted key field name or encrypted key header name must be set!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withOaepPaddingDigestAlgorithm('SHA-512')
@@ -149,7 +160,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenMissingBothIvFieldNameAndHeaderName() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('At least one of IV field name or IV header name must be set!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withOaepPaddingDigestAlgorithm('SHA-512')
@@ -160,7 +171,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenMissingFieldValueEncoding() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Value encoding for fields and headers cannot be empty!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withOaepPaddingDigestAlgorithm('SHA-512')
@@ -171,7 +182,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenEncryptedKeyAndIvHeaderNamesNotBothSetOrUnset() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('IV header name and encrypted key header name must be both set or both unset!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withOaepPaddingDigestAlgorithm('SHA-512')
@@ -184,7 +195,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
     }
 
     public function testBuild_ShouldThrowInvalidArgumentException_WhenEncryptedKeyAndIvFieldNamesNotBothSetOrUnset() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('IV field name and encrypted key field name must be both set or both unset!');
         FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
             ->withOaepPaddingDigestAlgorithm('SHA-512')

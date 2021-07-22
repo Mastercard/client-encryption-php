@@ -4,6 +4,8 @@ namespace Mastercard\Developer\Encryption;
 
 use Mastercard\Developer\Json\JsonPath;
 use Mastercard\Developer\Utils\EncodingUtils;
+use OpenSSLAsymmetricKey;
+use OpenSSLCertificate;
 use phpseclib\Crypt\Hash;
 
 /**
@@ -46,7 +48,7 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
-     * @param resource $encryptionCertificate
+     * @param OpenSSLCertificate|resource|string $encryptionCertificate
      * @see FieldLevelEncryptionConfig::encryptionCertificate.
      * @return $this
      */
@@ -76,7 +78,7 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
-     * @param resource $decryptionKey
+     * @param OpenSSLAsymmetricKey|resource $decryptionKey
      * @see FieldLevelEncryptionConfig::decryptionKey.
      * @return $this
      */

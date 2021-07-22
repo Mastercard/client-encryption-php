@@ -8,13 +8,13 @@ use PHPUnit\Framework\TestCase;
 class FileEncryptionParamsTest extends TestCase {
 
     private static function callWrapSecretKey($params) {
-        return TestUtils::callPrivateStatic('\FieldLevelEncryptionParams', 'wrapSecretKey', $params);
+        return TestUtils::callPrivateStatic(FieldLevelEncryptionParams::class, 'wrapSecretKey', $params);
     }
 
     private static function callUnwrapSecretKey($params) {
-        return TestUtils::callPrivateStatic('\FieldLevelEncryptionParams', 'unwrapSecretKey', $params);
+        return TestUtils::callPrivateStatic(FieldLevelEncryptionParams::class, 'unwrapSecretKey', $params);
     }
-    
+
     public function testGenerate_Nominal() {
 
         // GIVEN

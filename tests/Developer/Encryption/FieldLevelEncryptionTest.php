@@ -2,6 +2,7 @@
 
 namespace Mastercard\Developer\Encryption;
 
+use InvalidArgumentException;
 use Mastercard\Developer\Test\TestUtils;
 use Mastercard\Developer\Utils\EncryptionUtils;
 use Mastercard\Developer\Utils\StringUtils;
@@ -12,7 +13,7 @@ class FieldLevelEncryptionTest extends TestCase {
 
     public function testConstruct_ShouldBePrivate() {
         // GIVEN
-        $class = new ReflectionClass('Mastercard\Developer\Encryption\FieldLevelEncryption');
+        $class = new ReflectionClass(FieldLevelEncryption::class);
         $constructor = $class->getConstructor();
 
         // WHEN
@@ -27,11 +28,11 @@ class FieldLevelEncryptionTest extends TestCase {
     }
 
     private static function callEncryptBytes($params) {
-        return TestUtils::callPrivateStatic('\FieldLevelEncryption', 'encryptBytes', $params);
+        return TestUtils::callPrivateStatic(FieldLevelEncryption::class, 'encryptBytes', $params);
     }
 
     private static function callDecryptBytes($params) {
-        return TestUtils::callPrivateStatic('\FieldLevelEncryption', 'decryptBytes', $params);
+        return TestUtils::callPrivateStatic(FieldLevelEncryption::class, 'decryptBytes', $params);
     }
 
     private function assertDecryptedPayloadEquals($expectedPayload, $encryptedPayload, $config) {
@@ -320,8 +321,24 @@ class FieldLevelEncryptionTest extends TestCase {
             ->build();
 
         // THEN
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parent path not found in payload: \'$[\'parentNotInPayload\']\'!');
+
+        // WHEN
+        FieldLevelEncryption::encryptPayload($payload, $config);
+    }
+
+    public function testEncryptPayload_ShouldThrowInvalidArgumentException_WhenPayloadIsNotAnObject() {
+
+        // GIVEN
+        $payload = '[]';
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withEncryptionPath('', '')
+            ->build();
+
+        // THEN
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('An object was expected!');
 
         // WHEN
         FieldLevelEncryption::encryptPayload($payload, $config);
@@ -340,7 +357,7 @@ class FieldLevelEncryptionTest extends TestCase {
             ->build();
 
         // THEN
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('JSON object expected at path: \'encryptedData\'!');
 
         // WHEN
@@ -899,7 +916,7 @@ class FieldLevelEncryptionTest extends TestCase {
             ->build();
 
         // THEN
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parent path not found in payload: \'$[\'parentNotInPayload\']\'!');
 
         // WHEN
@@ -923,7 +940,7 @@ class FieldLevelEncryptionTest extends TestCase {
             ->build();
 
         // THEN
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('JSON object expected at path: \'data\'!');
 
         // WHEN
@@ -939,7 +956,7 @@ class FieldLevelEncryptionTest extends TestCase {
             ->build();
 
         // THEN
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('JSON object expected at path: \'encryptedData\'!');
 
         // WHEN
@@ -1278,7 +1295,7 @@ class FieldLevelEncryptionTest extends TestCase {
             ->build();
 
         // THEN
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Encryption params have to be set when not stored in HTTP payloads!');
 
         // WHEN

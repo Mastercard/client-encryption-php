@@ -324,7 +324,7 @@ class FieldLevelEncryption {
         if (is_null($object)) {
             throw new \InvalidArgumentException('Can\'t get a JSON string from a null object!');
         }
-        if (!is_object($object) && !is_array($object)) {
+        if (is_string($object)) {
             return $object;
         }
         return json_encode($object);

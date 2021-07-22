@@ -96,6 +96,12 @@ class JsonPathTest extends TestCase {
         $this->assertEquals('obj2', $jsonElementKey4);
     }
 
+    public function testGetElementKey_ShouldThrowInvalidArgumentException_WhenPathIsInvalid() {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported JSON path: $invalidPath!');
+        JsonPath::getElementKey('$invalidPath');
+    }
+
     public function testGetParent() {
 
         // GIVEN
@@ -123,6 +129,12 @@ class JsonPathTest extends TestCase {
         $this->assertEquals('$', $parentJsonPath5);
     }
 
+    public function testGetParent_ShouldThrowInvalidArgumentException_WhenPathIsInvalid() {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported JSON path: $invalidPath!');
+        JsonPath::getParentPath('$invalidPath');
+    }
+
     public function testFind() {
 
         // GIVEN
@@ -147,6 +159,7 @@ class JsonPathTest extends TestCase {
         $jsonElement5 = JsonPath::find($jsonObject, '$.child3.grandchild1');
         $jsonElement6 = JsonPath::find($jsonObject, '$.child3.grandchild2');
         $jsonElement7 = JsonPath::find($jsonObject, '$.not.existing.path');
+        $jsonElement8 = JsonPath::find($jsonObject, '$invalidPath');
 
         // THEN
         $this->assertSame($jsonObject, $jsonElement1);
@@ -156,6 +169,7 @@ class JsonPathTest extends TestCase {
         $this->assertSame($jsonObject->child3->grandchild1, $jsonElement5);
         $this->assertSame($jsonObject->child3->grandchild2, $jsonElement6);
         $this->assertNull($jsonElement7);
+        $this->assertNull($jsonElement8);
     }
 
     public function testDelete() {
