@@ -2,10 +2,10 @@
 
 namespace Mastercard\Developer\Test;
 
-use Mastercard\Developer\Encryption\EncryptionException;
 use Mastercard\Developer\Encryption\FieldLevelEncryptionConfigBuilder;
 use Mastercard\Developer\Encryption\FieldValueEncoding;
 use Mastercard\Developer\Utils\EncryptionUtils;
+use ReflectionClass;
 
 class TestUtils {
 
@@ -13,14 +13,14 @@ class TestUtils {
         if (is_string($args) || is_null($args)) {
             $args = array($args);
         }
-        $class = new \ReflectionClass('Mastercard\Developer\Encryption' . $className);
+        $class = new ReflectionClass($className);
         $method = $class->getMethod($functionName);
         $method->setAccessible(true);
         return $method->invokeArgs(null, $args);
     }
 
     public static function getTestEncryptionCertificate() {
-        return EncryptionUtils::loadEncryptionCertificate('./resources/Certificates/test_certificate-2048.pem');
+        return EncryptionUtils::loadEncryptionCertificate(dirname(dirname(dirname(__DIR__))).'/resources/Certificates/test_certificate-2048.pem');
     }
 
     public static function getTestInvalidEncryptionCertificate() {
@@ -28,7 +28,7 @@ class TestUtils {
     }
 
     public static function getTestDecryptionKey() {
-        return EncryptionUtils::loadDecryptionKey('./resources/Keys/Pkcs8/test_key_pkcs8-2048.der');
+        return EncryptionUtils::loadDecryptionKey(dirname(dirname(dirname(__DIR__))).'/resources/Keys/Pkcs8/test_key_pkcs8-2048.der');
     }
 
     public static function getTestFieldLevelEncryptionConfigBuilder() {

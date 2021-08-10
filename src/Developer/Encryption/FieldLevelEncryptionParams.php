@@ -1,6 +1,8 @@
 <?php
 
 namespace Mastercard\Developer\Encryption;
+use Error;
+use Exception;
 use Mastercard\Developer\Utils\EncodingUtils;
 use phpseclib\Crypt\RSA;
 
@@ -24,7 +26,7 @@ class FieldLevelEncryptionParams {
      * @param FieldLevelEncryptionConfig $config
      * @param string|null $ivValue
      * @param string|null $encryptedKeyValue
-     * @param null $oaepPaddingDigestAlgorithmValue
+     * @param string|null $oaepPaddingDigestAlgorithmValue
      */
     public function __construct($config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue = null) {
         $this->ivValue = $ivValue;
@@ -63,21 +65,28 @@ class FieldLevelEncryptionParams {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIvValue() {
         return $this->ivValue;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEncryptedKeyValue() {
         return $this->encryptedKeyValue;
     }
 
+    /**
+     * @return string|null
+     */
     public function getOaepPaddingDigestAlgorithmValue() {
         return $this->oaepPaddingDigestAlgorithmValue;
     }
 
     /**
+     * @return string|false
      * @throws EncryptionException
      */
     public function getIvBytes() {
@@ -88,12 +97,13 @@ class FieldLevelEncryptionParams {
             // Decode the IV
             $this->iv = EncodingUtils::decodeValue($this->ivValue, $this->config->getFieldValueEncoding());
             return $this->iv;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new EncryptionException('Failed to decode the provided IV value!', $e);
         }
     }
 
     /**
+     * @return string
      * @throws EncryptionException
      */
     public function getSecretKeyBytes() {
@@ -107,12 +117,15 @@ class FieldLevelEncryptionParams {
             return $this->secretKey;
         } catch (EncryptionException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new EncryptionException('Failed to decode and unwrap the provided secret key value!', $e);
         }
     }
 
     /**
+     * @param FieldLevelEncryptionConfig $config
+     * @param string                     $keyBytes
+     * @return string
      * @throws EncryptionException
      */
     private static function wrapSecretKey($config, $keyBytes) {
@@ -121,12 +134,18 @@ class FieldLevelEncryptionParams {
             $publicKey = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate));
             $rsa = self::getRsa($config->getOaepPaddingDigestAlgorithm(), $publicKey['key'], RSA::PUBLIC_FORMAT_PKCS1);
             return $rsa->encrypt($keyBytes);
-        } catch (\Exception $e) {
+        } catch (Error $e) { // Needed for PHP 5.6 compatibility, both cases should be caught with Throwable from PHP 7.0
+            throw new EncryptionException('Failed to wrap secret key!', $e);
+        } catch (Exception $e) {
             throw new EncryptionException('Failed to wrap secret key!', $e);
         }
     }
 
     /**
+     * @param FieldLevelEncryptionConfig $config
+     * @param string                     $wrappedKeyBytes
+     * @param string                     $oaepPaddingDigestAlgorithm
+     * @return string
      * @throws EncryptionException
      */
     private static function unwrapSecretKey($config, $wrappedKeyBytes, $oaepPaddingDigestAlgorithm) {
@@ -135,11 +154,17 @@ class FieldLevelEncryptionParams {
             $rawPrivateKey = openssl_pkey_get_details($decryptionKey)['rsa'];
             $rsa = self::getRsa($oaepPaddingDigestAlgorithm, self::toDsigXmlPrivateKey($rawPrivateKey), RSA::PRIVATE_FORMAT_XML);
             return $rsa->decrypt($wrappedKeyBytes);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new EncryptionException('Failed to unwrap secret key!', $e);
         }
     }
 
+    /**
+     * @param string    $oaepPaddingDigestAlgorithm
+     * @param string    $key
+     * @param int|false $type
+     * @return RSA
+     */
     private static function getRsa($oaepPaddingDigestAlgorithm, $key, $type) {
         $rsa = new RSA();
         $rsa->setEncryptionMode(RSA::ENCRYPTION_OAEP);
@@ -150,6 +175,10 @@ class FieldLevelEncryptionParams {
         return $rsa;
     }
 
+    /**
+     * @param array $raw
+     * @return string
+     */
     private static function toDsigXmlPrivateKey($raw) {
         return "<RSAKeyValue>\r\n" .
             '  <Modulus>' . base64_encode($raw['n']) . "</Modulus>\r\n" .
