@@ -3,3 +3,5 @@ vendor
 tests.xml
 coverage.xml
 .scannerwork
+.phpunit.result.cache
+composer.lock
