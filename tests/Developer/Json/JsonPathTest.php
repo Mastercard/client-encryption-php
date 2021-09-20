@@ -210,20 +210,6 @@ class JsonPathTest extends TestCase {
         $this->assertEquals(json_decode($json), $jsonObject);
     }
 
-    public function testFind_ShouldThrowInvalidArgumentException_WhenArrayPassedAsArgument() {
-
-        // GIVEN
-        $json = '{}';
-        $jsonArray = json_decode($json, true);
-
-        // THEN
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('An object was expected!');
-
-        // WHEN
-        JsonPath::find($jsonArray, '$');
-    }
-
     public function testGetParentPath_ShouldThrowInvalidArgumentException_WhenJsonPathEmpty() {
 
         // GIVEN

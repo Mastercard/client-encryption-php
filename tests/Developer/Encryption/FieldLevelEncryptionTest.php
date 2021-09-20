@@ -328,22 +328,6 @@ class FieldLevelEncryptionTest extends TestCase {
         FieldLevelEncryption::encryptPayload($payload, $config);
     }
 
-    public function testEncryptPayload_ShouldThrowInvalidArgumentException_WhenPayloadIsNotAnObject() {
-
-        // GIVEN
-        $payload = '[]';
-        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
-            ->withEncryptionPath('', '')
-            ->build();
-
-        // THEN
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('An object was expected!');
-
-        // WHEN
-        FieldLevelEncryption::encryptPayload($payload, $config);
-    }
-
     public function testEncryptPayload_ShouldThrowInvalidArgumentException_WhenOutPathIsPathToJsonPrimitive() {
 
         // GIVEN
@@ -698,6 +682,67 @@ class FieldLevelEncryptionTest extends TestCase {
         $encryptedData = $encryptedPayloadObject->encryptedData;
         $this->assertNotEmpty($encryptedData);
         $this->assertEquals(1, count((array)$encryptedData)); // 'encryptedValue' only
+    }
+
+    public function testEncryptPayload_ShouldEncryptRootArrays() {
+        // GIVEN
+        $payload = '[
+            {},
+            {}
+        ]';
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withEncryptionPath('$', '$')
+            ->withOaepPaddingDigestAlgorithm('SHA-256')
+            ->build();
+
+        // WHEN
+        $encryptedPayload = FieldLevelEncryption::encryptPayload($payload, $config);
+
+        // THEN
+        $encryptedPayloadObject = json_decode($encryptedPayload);
+        $this->assertNotEmpty($encryptedPayloadObject);
+        $encryptedValue = $encryptedPayloadObject->encryptedValue;
+        $this->assertNotEmpty($encryptedValue);
+        $this->assertEquals(6, count((array)$encryptedPayloadObject));
+    }
+
+    public function testEncryptPayload_ShouldEncryptComplexRootArrays() {
+        // GIVEN
+        $payload = '[
+            {
+                "data": {
+                    "field1": "value1",
+                    "field2": [
+                        "arrayValue1", 
+                        "arrayValue2"
+                    ]
+                }
+            },
+            {
+                "data": {
+                    "field3": "value2",
+                    "field4": [
+                        "arrayValue3", 
+                        "arrayValue4"
+                    ]
+                }
+            }
+        ]';
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withEncryptionPath('$', '$')
+            ->withOaepPaddingDigestAlgorithm('SHA-256')
+            ->build();
+
+        // WHEN
+        $encryptedPayload = FieldLevelEncryption::encryptPayload($payload, $config);
+
+        // THEN
+        error_log($encryptedPayload);
+        $encryptedPayloadObject = json_decode($encryptedPayload);
+        $this->assertNotEmpty($encryptedPayloadObject);
+        $encryptedValue = $encryptedPayloadObject->encryptedValue;
+        $this->assertNotEmpty($encryptedValue);
+        $this->assertEquals(6, count((array)$encryptedPayloadObject));
     }
 
     public function testDecryptPayload_Nominal() {
@@ -1300,5 +1345,49 @@ class FieldLevelEncryptionTest extends TestCase {
 
         // WHEN
         FieldLevelEncryption::decryptPayload($encryptedPayload, $config, null);
+    }
+
+    public function testDecryptPayload_ShouldDecryptRootArrays() {
+
+        // GIVEN
+        $encryptedPayload = '{
+            "encryptedValue":"cf3762b1fa599e372eefe3e89ad81820",
+            "iv":"63e25a4515f0a06dd6b4838e8ea77abe",
+            "encryptedKey":"d3338322318e7801e652818e59174a694d347849bce30a032a7de609365789f1fd5f08f518ce1a4deede9387b855cd4920a486a1a37b5c5e4d766ffbe85223fc3676bb5f4476b8edfd90fee06486da05b9a5c43f299867e152cbbed4f464e9c0ce1fbc5f6f5e9792d7ecfc990c08fbd241a9c2e60f31387c99b9e3e5fffa9e43277aa5b9bb47b7d0db8715b8b04831dae05362d257c72427792c311a9d1ec983dc43eefee8dac62439fe2a1e1dc84fc51f784bec58b820e3135a9e324e2a8c1d9ed8cb458cf467dbed6b5328f7ea071fcc4a8d3ccc649e560b65a61915e285676da275035722f6c31e6a6d1fc5ed1d659aeeb0ed5d7eb725066c35b236dbb99d",
+            "encryptionCertificateFingerprint":"80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279",
+            "encryptionKeyFingerprint":"761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79",
+            "oaepHashingAlgorithm":"SHA256"
+        }';
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withDecryptionPath('$', '$')
+            ->build();
+
+        // WHEN
+        $payload = FieldLevelEncryption::decryptPayload($encryptedPayload, $config);
+
+        // THEN
+        $this->assertJsonStringEqualsJsonString('[{},{}]', $payload);
+    }
+
+    public function testDecryptPayload_ShouldDecryptComplexRootArrays() {
+
+        // GIVEN
+        $encryptedPayload = '{
+            "encryptedValue":"ee0973e4be3cf9080e6f8aab8f2d5c36fec3ddee2a99532921ef4698f1e5e06e60b7862013c0a860f5ad6708a965881124d7d5ba4e87e1b439f9f5a6fe40ab168ceaca98d44fbfe83a233486c2a05c47373d6a67080fa8bd94bd3ad1dcca6bad6dc72ad98a9077a29585317f938b35c6ba5c83943a5b3f957c9d240e488b99190197e9a4840242d99c7220832c3423bf",
+            "iv":"20a11d0f709c3a70c25ef950fa348cc8",
+            "encryptedKey":"5179ec91b5961ce568691c6194c1a0fea3d3b976af797dc2db6497ca7b9775d97954d8161dfec9e7ed86b8b61d140ebed2e185ce68e24e42baebad46cdc84bc568b184d07592acc10dad5bbb95abfdc0f5ebfdbb304301abccab28419fbff55325d7aa06c34a3b006773f4de5d947177da13a46131a65ceebcb14a6f86d73bf860e3a60fca7b52e1966a3762c8b17fbb10b067f443c2fb88f38a35834da61b8821592c47477215eb59fa176aff78f1ca392eda36743d9ebd20613c0d7fb71301c06f90f5439a3c24e1401388771392867adaa36181a8502b3584b4ee73d2363257c81f29f37a76e6e91167628ac763e2c4f940027cda2d3b770fcfd9a4cc1a0f",
+            "encryptionCertificateFingerprint":"80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279",
+            "encryptionKeyFingerprint":"761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79",
+            "oaepHashingAlgorithm":"SHA256"
+        }';
+        $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
+            ->withDecryptionPath('$', '$')
+            ->build();
+
+        // WHEN
+        $payload = FieldLevelEncryption::decryptPayload($encryptedPayload, $config);
+
+        // THEN
+        $this->assertJsonStringEqualsJsonString('[{"data":{"field1":"value1","field2":["arrayValue1","arrayValue2"]}},{"data":{"field3":"value2","field4":["arrayValue3","arrayValue4"]}}]', $payload);
     }
 }
