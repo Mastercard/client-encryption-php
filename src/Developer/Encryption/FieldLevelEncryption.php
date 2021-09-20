@@ -33,7 +33,7 @@ class FieldLevelEncryption {
 
             // Perform encryption (if needed)
             foreach ($config->getEncryptionPaths() as $jsonPathIn => $jsonPathOut) {
-                self::encryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params);
+                $payloadJsonObject = self::encryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params);
             }
 
             // Return the updated payload
@@ -64,7 +64,7 @@ class FieldLevelEncryption {
 
             // Perform decryption (if needed)
             foreach ($config->getDecryptionPaths() as $jsonPathIn => $jsonPathOut) {
-                self::decryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params);
+                $payloadJsonObject = self::decryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config, $params);
             }
 
             // Return the updated payload
@@ -91,7 +91,7 @@ class FieldLevelEncryption {
         $inJsonObject = self::readJsonElement($payloadJsonObject, $jsonPathIn);
         if (is_null($inJsonObject)) {
             // Nothing to encrypt
-            return;
+            return $payloadJsonObject;
         }
 
         if (empty($params)) {
@@ -108,10 +108,7 @@ class FieldLevelEncryption {
         if ('$' !== $jsonPathIn) {
             JsonPath::delete($payloadJsonObject, $jsonPathIn);
         } else {
-            // Delete keys one by one
-            foreach ($inJsonObject as $key => $value) {
-                unset($inJsonObject->$key);
-            }
+            $payloadJsonObject = json_decode('{}');
         }
 
         // Add encrypted data and encryption fields at the given JSON path
@@ -132,6 +129,7 @@ class FieldLevelEncryption {
         if (!empty($config->getOaepPaddingDigestAlgorithmFieldName())) {
             $outJsonObject->{$config->getOaepPaddingDigestAlgorithmFieldName()} = $params->getOaepPaddingDigestAlgorithmValue();
         }
+        return $payloadJsonObject;
     }
 
     /**
@@ -147,14 +145,14 @@ class FieldLevelEncryption {
         $inJsonObject = self::readJsonObject($payloadJsonObject, $jsonPathIn);
         if (is_null($inJsonObject)) {
             // Nothing to decrypt
-            return;
+            return $payloadJsonObject;
         }
 
         // Read and remove encrypted data and encryption fields at the given JSON path
         $encryptedValueJsonElement = self::readAndDeleteJsonKey($inJsonObject, $config->getEncryptedValueFieldName());
         if (empty($encryptedValueJsonElement)) {
             // Nothing to decrypt
-            return;
+            return $payloadJsonObject;
         }
 
         if (!$config->useHttpPayloads() && empty($params)) {
@@ -176,16 +174,17 @@ class FieldLevelEncryption {
         $encryptedValueBytes = EncodingUtils::decodeValue($encryptedValueJsonElement, $config->getFieldValueEncoding());
         $decryptedValueBytes = self::decryptBytes($params->getSecretKeyBytes(), $params->getIvBytes(), $encryptedValueBytes);
 
-       // Add decrypted data at the given JSON path
+        // Add decrypted data at the given JSON path
         $decryptedValue = self::sanitizeJson($decryptedValueBytes);
         $outJsonObject = self::checkOrCreateOutObject($payloadJsonObject, $jsonPathOut);
-        self::addDecryptedDataToPayload($payloadJsonObject, $jsonPathOut, $outJsonObject, $decryptedValue);
+        $payloadJsonObject = self::addDecryptedDataToPayload($payloadJsonObject, $jsonPathOut, $outJsonObject, $decryptedValue);
 
         // Remove the input if now empty
         $inJsonElement = self::readJsonElement($payloadJsonObject, $jsonPathIn);
         if (empty((array)$inJsonElement) && '$' !== $jsonPathIn) {
             JsonPath::delete($payloadJsonObject, $jsonPathIn);
         }
+        return $payloadJsonObject;
     }
 
     /**
@@ -200,19 +199,25 @@ class FieldLevelEncryption {
             // 'json_decode' returns null for strings
             $decryptedValueJsonElement = $decryptedValue;
         }
+
+        if ('$' === $jsonPathOut && is_array($decryptedValueJsonElement)) {
+            return $decryptedValueJsonElement;
+        }
+
         if (!is_object($decryptedValueJsonElement)) {
             // Array or primitive: overwrite
             $parentPath = JsonPath::getParentPath($jsonPathOut);
             $elementKey = JsonPath::getElementKey($jsonPathOut);
             $parentObject = JsonPath::find($payloadJsonObject, $parentPath);
             $parentObject->$elementKey = $decryptedValueJsonElement;
-            return;
+            return $payloadJsonObject;
         }
 
         // Object: merge
         foreach ($decryptedValueJsonElement as $key => $value) {
             $outJsonObject->$key = $value;
         }
+        return $payloadJsonObject;
     }
 
     /**

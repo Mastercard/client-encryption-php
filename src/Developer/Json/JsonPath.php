@@ -53,8 +53,8 @@ class JsonPath {
      * @throws \InvalidArgumentException
      */
     static function find($jsonObject, $path) {
-        if (!is_object($jsonObject)) {
-            throw new \InvalidArgumentException('An object was expected!');
+        if (!is_object($jsonObject) && !is_array($jsonObject)) {
+            throw new \InvalidArgumentException('An object/array was expected!');
         }
 
         $normalizedPath = self::normalizePath($path);
