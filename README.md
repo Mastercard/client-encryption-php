@@ -47,7 +47,7 @@ composer require mastercard/client-encryption
 A certificate resource can be created from a file by calling `EncryptionUtils::loadEncryptionCertificate`:
 ```php
 use Mastercard\Developer\Utils\EncryptionUtils;
-// ...
+// …
 $encryptionCertificate = EncryptionUtils::loadEncryptionCertificate('<insert certificate file path>');
 ```
 
@@ -60,7 +60,7 @@ Supported certificate formats: PEM, DER.
 A private key resource can be created from a PKCS#12 key store by calling `EncryptionUtils::loadDecryptionKey` the following way:
 ```php
 use Mastercard\Developer\Utils\EncryptionUtils;
-// ...
+// …
 $decryptionKey = EncryptionUtils::loadDecryptionKey(
                                     '<insert PKCS#12 key file path>', 
                                     '<insert key alias>', 
@@ -72,7 +72,7 @@ $decryptionKey = EncryptionUtils::loadDecryptionKey(
 A private key resource can be created from an unencrypted key file by calling `EncryptionUtils::loadDecryptionKey` the following way:
 ```php
 use Mastercard\Developer\Utils\EncryptionUtils;
-// ...
+// …
 $decryptionKey = EncryptionUtils::loadDecryptionKey('<insert key file path>');
 ```
 
@@ -98,14 +98,14 @@ The core methods responsible for payload encryption and decryption are `encryptP
 * `encryptPayload` usage:
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $encryptedRequestPayload = FieldLevelEncryption::encryptPayload($requestPayload, $config);
 ```
 
 * `decryptPayload` usage:
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $responsePayload = FieldLevelEncryption::decryptPayload($encryptedResponsePayload, $config);
 ```
 
@@ -113,7 +113,7 @@ $responsePayload = FieldLevelEncryption::decryptPayload($encryptedResponsePayloa
 Use the `FieldLevelEncryptionConfigBuilder` to create `FieldLevelEncryptionConfig` instances. Example:
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
     ->withEncryptionCertificate($encryptionCertificate)
     ->withDecryptionKey($decryptionKey)
@@ -138,7 +138,7 @@ Call `FieldLevelEncryption::encryptPayload` with a JSON request payload and a `F
 Example using the configuration [above](#configuring-the-field-level-encryption):
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $payload = '{
     "path": {
         "to": {
@@ -160,8 +160,8 @@ Output:
         "to": {
             "encryptedFoo": {
                 "iv": "7f1105fb0c684864a189fb3709ce3d28",
-                "encryptedKey": "67f467d1b653d98411a0c6d3c(...)ffd4c09dd42f713a51bff2b48f937c8",
-                "encryptedValue": "b73aabd267517fc09ed72455c2(...)dffb5fa04bf6e6ce9ade1ff514ed6141"
+                "encryptedKey": "67f467d1b653d98411a0c6d3c…ffd4c09dd42f713a51bff2b48f937c8",
+                "encryptedValue": "b73aabd267517fc09ed72455c2…dffb5fa04bf6e6ce9ade1ff514ed6141"
             }
         }
     }
@@ -175,14 +175,14 @@ Call `FieldLevelEncryption::decryptPayload` with a JSON response payload and a `
 Example using the configuration [above](#configuring-the-field-level-encryption):
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $encryptedPayload = '{
     "path": {
         "to": {
             "encryptedFoo": {
                 "iv": "e5d313c056c411170bf07ac82ede78c9",
-                "encryptedKey": "e3a56746c0f9109d18b3a2652b76(...)f16d8afeff36b2479652f5c24ae7bd",
-                "encryptedValue": "809a09d78257af5379df0c454dcdf(...)353ed59fe72fd4a7735c69da4080e74f"
+                "encryptedKey": "e3a56746c0f9109d18b3a2652b76…f16d8afeff36b2479652f5c24ae7bd",
+                "encryptedValue": "809a09d78257af5379df0c454dcdf…353ed59fe72fd4a7735c69da4080e74f"
             }
         }
     }
@@ -211,18 +211,18 @@ Entire payloads can be encrypted using the '$' operator as encryption path:
 
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
     ->withEncryptionCertificate(encryptionCertificate)
     ->withEncryptionPath('$', '$')
-    // ...
+    // …
     ->build();
 ```
 
 Example:
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $payload = '{
     "sensitiveField1": "sensitiveValue1",
     "sensitiveField2": "sensitiveValue2"
@@ -235,8 +235,8 @@ Output:
 ```json
 {
     "iv": "1b9396c98ab2bfd195de661d70905a45",
-    "encryptedKey": "7d5112fa08e554e3dbc455d0628(...)52e826dd10311cf0d63bbfb231a1a63ecc13",
-    "encryptedValue": "e5e9340f4d2618d27f8955828c86(...)379b13901a3b1e2efed616b6750a90fd379515"
+    "encryptedKey": "7d5112fa08e554e3dbc455d0628…52e826dd10311cf0d63bbfb231a1a63ecc13",
+    "encryptedValue": "e5e9340f4d2618d27f8955828c86…379b13901a3b1e2efed616b6750a90fd379515"
 }
 ```
 
@@ -246,22 +246,22 @@ Entire payloads can be decrypted using the '$' operator as decryption path:
 
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
     ->withDecryptionKey(decryptionKey)
     ->withDecryptionPath('$', '$')
-    // ...
+    // …
     ->build();
 ```
 
 Example:
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $encryptedPayload = '{
     "iv": "1b9396c98ab2bfd195de661d70905a45",
-    "encryptedKey": "7d5112fa08e554e3dbc455d0628(...)52e826dd10311cf0d63bbfb231a1a63ecc13",
-    "encryptedValue": "e5e9340f4d2618d27f8955828c86(...)379b13901a3b1e2efed616b6750a90fd379515"
+    "encryptedKey": "7d5112fa08e554e3dbc455d0628…52e826dd10311cf0d63bbfb231a1a63ecc13",
+    "encryptedValue": "e5e9340f4d2618d27f8955828c86…379b13901a3b1e2efed616b6750a90fd379515"
 }';
 $payload = FieldLevelEncryption::decryptPayload($encryptedPayload, $config);
 echo (json_encode(json_decode($payload), JSON_PRETTY_PRINT));
@@ -286,7 +286,7 @@ Here is how to configure the library for using HTTP headers instead.
 Call `with{Param}HeaderName` instead of `with{Param}FieldName` when building a `FieldLevelEncryptionConfig` instance. Example:
 ```php
 use Mastercard\Developer\Encryption;
-// ...
+// …
 $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
     ->withEncryptionCertificate(encryptionCertificate)
     ->withDecryptionKey(decryptionKey)
@@ -296,7 +296,7 @@ $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
     ->withEncryptedValueFieldName('data')
     ->withIvHeaderName('x-iv')
     ->withEncryptedKeyHeaderName('x-encrypted-key')
-    // ...
+    // …
     ->withFieldValueEncoding(FieldValueEncoding::HEX)
     ->build();
 ```
@@ -320,7 +320,7 @@ $params = FieldLevelEncryptionParams::generate($config);
 ```php
 $request->setHeader($config->getIvHeaderName(), $params->getIvValue());
 $request->setHeader($config->getEncryptedKeyHeaderName(), $params->getEncryptedKeyValue());
-// ...
+// …
 ```
 
 3. Call `encryptPayload` with params:
@@ -342,7 +342,7 @@ echo (json_encode(json_decode($encryptedPayload), JSON_PRETTY_PRINT));
 Output:
 ```json
 {
-    "data": "53b5f07ee46403af2e92abab900853(...)d560a0a08a1ed142099e3f4c84fe5e5"
+    "data": "53b5f07ee46403af2e92abab900853…d560a0a08a1ed142099e3f4c84fe5e5"
 }
 ```
 
@@ -355,13 +355,13 @@ Decryption can be performed using the following steps:
 ```php
 $ivValue = $response->getHeader($config->getIvHeaderName());
 $encryptedKeyValue = $response->getHeader($config->getEncryptedKeyHeaderName());
-// ...
+// …
 ```
 
 2. Create a `FieldLevelEncryptionParams` instance:
 
 ```php
-$params = new FieldLevelEncryptionParams($config, $ivValue, $encryptedKeyValue, ..., );
+$params = new FieldLevelEncryptionParams($config, $ivValue, $encryptedKeyValue, …, );
 ```
 
 3. Call `decryptPayload` with params:
@@ -373,7 +373,7 @@ Example using the configuration [above](#configuration-for-using-http-headers):
 
 ```php
 $encryptedPayload = '{
-    "data": "53b5f07ee46403af2e92abab900853(...)d560a0a08a1ed142099e3f4c84fe5e5"
+    "data": "53b5f07ee46403af2e92abab900853…d560a0a08a1ed142099e3f4c84fe5e5"
 }';
 $payload = FieldLevelEncryption::decryptPayload($encryptedPayload, $config, $params);
 echo (json_encode(json_decode($payload), JSON_PRETTY_PRINT));
@@ -404,10 +404,10 @@ Generators currently supported:
 
 Client libraries can be generated using the following command:
 ```shell
-java -jar openapi-generator-cli.jar generate -i openapi-spec.yaml -g php -o out
+openapi-generator-cli generate -i openapi-spec.yaml -g php -o out
 ```
 See also: 
-* [OpenAPI Generator (executable)](https://mvnrepository.com/artifact/org.openapitools/openapi-generator-cli)
+* [OpenAPI Generator CLI Installation](https://openapi-generator.tech/docs/installation/)
 * [CONFIG OPTIONS for php](https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/php.md)
 
 ##### Usage of the `PsrHttpMessageEncryptionInterceptor`
@@ -418,12 +418,12 @@ use OpenAPI\Client\Api\ServiceApi;
 use OpenAPI\Client\Configuration
 use Mastercard\Developer\Signers\PsrHttpMessageSigner;
 use Mastercard\Developer\Interceptors\PsrHttpMessageEncryptionInterceptor;
-// ...
+// …
 
 $stack = new GuzzleHttp\HandlerStack();
 $stack->setHandler(new GuzzleHttp\Handler\CurlHandler());
 $fieldLevelEncryptionConfig = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
-    // ...
+    // …
     ->build();
 $fieldLevelEncryptionInterceptor = new PsrHttpMessageEncryptionInterceptor($fieldLevelEncryptionConfig);
 $stack->push(GuzzleHttp\Middleware::mapRequest([$fieldLevelEncryptionInterceptor, 'interceptRequest']));
@@ -434,5 +434,5 @@ $client = new GuzzleHttp\Client($options);
 $config = new Configuration();
 $config->setHost('https://sandbox.api.mastercard.com');
 $serviceApi = new ServiceApi($client, $config);
-// ...
+// …
 ```
