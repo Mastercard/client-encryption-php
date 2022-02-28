@@ -1,13 +1,36 @@
 <?php
+
 namespace Mastercard\Developer\Utils;
 
 use Mastercard\Developer\Encryption\FieldValueEncoding;
 
-class EncodingUtils {
+class EncodingUtils
+{
 
-    private function __construct() {
+    private function __construct()
+    {
         // This class can't be instantiated
     }
+
+
+    public static function base64UrlDecode($data, $strict = false)
+    {
+        // Convert Base64URL to Base64 by replacing “-” with “+” and “_” with “/”
+        $b64 = strtr($data, '-_', '+/');
+
+        // Decode Base64 string and return the original data
+        return base64_decode($b64, $strict);
+    }
+
+    public static function base64UrlEncode(string $text): string
+    {
+        return str_replace(
+            ['+', '/', '='],
+            ['-', '_', ''],
+            base64_encode($text)
+        );
+    }
+
 
     /**
      * @param string|null $bytes
@@ -15,7 +38,8 @@ class EncodingUtils {
      * @return string
      * @throws \InvalidArgumentException
      */
-    static function encodeBytes($bytes, $encoding) {
+    static function encodeBytes($bytes, $encoding)
+    {
         return $encoding === FieldValueEncoding::HEX ? self::hexEncode($bytes) : base64_encode($bytes);
     }
 
@@ -25,7 +49,8 @@ class EncodingUtils {
      * @return string|false
      * @throws \InvalidArgumentException
      */
-    static function decodeValue($value, $encoding) {
+    static function decodeValue($value, $encoding)
+    {
         return $encoding === FieldValueEncoding::HEX ? self::hexDecode($value) : base64_decode($value);
     }
 
@@ -34,7 +59,8 @@ class EncodingUtils {
      * @return string
      * @throws \InvalidArgumentException
      */
-    static function hexEncode($bytes) {
+    static function hexEncode($bytes)
+    {
         if ('' === $bytes) {
             return '';
         }
@@ -49,7 +75,8 @@ class EncodingUtils {
      * @return string|false
      * @throws \InvalidArgumentException
      */
-    static function hexDecode($value) {
+    static function hexDecode($value)
+    {
         if ('' === $value) {
             return '';
         }
@@ -68,8 +95,9 @@ class EncodingUtils {
      * @param string $footer
      * @return string
      */
-    static function derToPem($der, $header, $footer) {
-        return $header . "\r\n". chunk_split(base64_encode($der), 64, "\r\n") . $footer;
+    static function derToPem($der, $header, $footer)
+    {
+        return $header . "\r\n" . chunk_split(base64_encode($der), 64, "\r\n") . $footer;
     }
 
     /**
@@ -78,7 +106,8 @@ class EncodingUtils {
      * @param string $footer
      * @return string|false
      */
-    static function pemToDer($pem, $header, $footer) {
+    static function pemToDer($pem, $header, $footer)
+    {
         $der = str_replace($header, '', $pem);
         $der = str_replace($footer, '', $der);
         return base64_decode($der);
