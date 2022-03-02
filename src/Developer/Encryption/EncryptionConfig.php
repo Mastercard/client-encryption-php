@@ -4,35 +4,30 @@ namespace Mastercard\Developer\Encryption;
 
 abstract class EncryptionConfig
 {
-
-    protected function __construct()
-    {
-    }
-
     /**
      * The different methods of encryption
      */
     /**
      * The encryption scheme to be used
      */
-    private $scheme = EncryptionConfigScheme::LEGACY;
+    protected $scheme = EncryptionConfigScheme::LEGACY;
 
     /**
      * The SHA-256 hex-encoded digest of the key used for encryption (optional, the digest will be
      * automatically computed if this field is null or empty).
      * Example: "c3f8ef7053c4fb306f7476e7d1956f0aa992ff9dfdd5244b912a1d377ff3a84f"
      */
-    private string $encryptionKeyFingerprint;
+    protected string|null $encryptionKeyFingerprint = null;
 
     /**
      * A certificate object whose public key will be used for encryption.
      */
-    private $encryptionCertificate;
+    protected $encryptionCertificate;
 
     /**
      * A private key object to be used for decryption.
      */
-    private string $decryptionKey;
+    protected string|null $decryptionKey = null;
 
     /**
      * A list of JSON paths to encrypt in request payloads.
@@ -63,9 +58,9 @@ abstract class EncryptionConfig
     /**
      * The name of the payload field where to write/read the encrypted data value.
      */
-    private $encryptedValueFieldName = null;
+    protected $encryptedValueFieldName = null;
 
-    public function getEncryptionKeyFingerprint(): string
+    public function getEncryptionKeyFingerprint(): string|null
     {
         return $this->encryptionKeyFingerprint;
     }
@@ -85,19 +80,49 @@ abstract class EncryptionConfig
         return $this->scheme;
     }
 
+    public function setEncryptionKeyFingerprint(string|null $encryptionKeyFingerprint)
+    {
+        $this->encryptionKeyFingerprint = $encryptionKeyFingerprint;
+    }
 
-    protected function getEncryptionPaths(): array
+    public function setEncryptionCertificate($encryptionCertificate)
+    {
+        $this->encryptionCertificate = $encryptionCertificate;
+    }
+
+    public function setDecryptionKey(string|null $decryptionKey)
+    {
+        $this->decryptionKey = $decryptionKey;
+    }
+
+    public function setEncryptedValueFieldName($encryptedValueFieldName)
+    {
+        $this->encryptedValueFieldName = $encryptedValueFieldName;
+    }
+
+    public function setEncryptionPaths(array $encryptionPaths)
+    {
+        $this->encryptionPaths = $encryptionPaths;
+    }
+
+    public function setDecryptionPaths(array $decryptionPaths)
+    {
+        $this->decryptionPaths = $decryptionPaths;
+    }
+
+    public function getEncryptionPaths(): array
     {
         return $this->encryptionPaths;
     }
 
-    protected function getDecryptionPaths(): array
+    public function getDecryptionPaths(): array
     {
         return $this->decryptionPaths;
     }
 
-    protected function getEncryptedValueFieldName(): string
+    public function getEncryptedValueFieldName(): string
     {
         return $this->encryptedValueFieldName;
     }
+    
 }
