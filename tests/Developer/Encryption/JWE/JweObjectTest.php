@@ -16,9 +16,6 @@ class JweObjectTest extends TestCase
 
         $mockConfig = Phake::mock(JweConfig::class);
 
-        Phake::when($mockConfig)->getEncryptedKey()
-            ->thenReturn(file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem"));
-
         Phake::when($mockConfig)->getDecryptionKey()
             ->thenReturn(file_get_contents(__DIR__ . "/../../../resources/keys/pkcs8/test_key_pkcs8-2048.pem"));
 
@@ -33,15 +30,37 @@ class JweObjectTest extends TestCase
 
         $mockConfig = Phake::mock(JweConfig::class);
 
-        Phake::when($mockConfig)->getEncryptedKey()
-            ->thenReturn(file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem"));
-
         Phake::when($mockConfig)->getDecryptionKey()
             ->thenReturn(file_get_contents(__DIR__ . "/../../../resources/keys/pkcs8/test_key_pkcs8-2048.pem"));
 
         $decryptedPayload = $jweObject->decrypt($mockConfig);
 
         $this->assertEquals("bar", $decryptedPayload);
+    }
+
+    public function testEncryptWithGCM()
+    {
+        $mockConfig = Phake::mock(JweConfig::class);
+
+        Phake::when($mockConfig)->getEncryptionCertificate()
+            ->thenReturn(file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem"));
+
+        Phake::when($mockConfig)->getDecryptionKey()
+            ->thenReturn(file_get_contents(__DIR__ . "/../../../resources/keys/pkcs8/test_key_pkcs8-2048.pem"));
+
+        Phake::when($mockConfig)->getEncryptionKeyFingerprint()
+            ->thenReturn("761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79");
+
+        $jweHeader = new JweHeader("RSA-OAEP-256", "A256GCM", $mockConfig->getEncryptionKeyFingerprint(), "application/json");
+
+        $originalPayload = "Hello world";
+
+        $jwePayload = JweObject::encrypt($mockConfig, $originalPayload, $jweHeader);
+        $jweObject = JweObject::parse($jwePayload);
+
+        $decryptedPayload = $jweObject->decrypt($mockConfig);
+
+        $this->assertEquals($originalPayload, $decryptedPayload);
     }
 
     public function testParse()

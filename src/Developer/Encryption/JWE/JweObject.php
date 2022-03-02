@@ -5,9 +5,11 @@ namespace Mastercard\Developer\Encryption\JWE;
 use Mastercard\Developer\Encryption\JweConfig;
 use Mastercard\Developer\Encryption\AES\AESCBC;
 use Mastercard\Developer\Encryption\AES\AESGCM;
+use Mastercard\Developer\Encryption\AES\AESEncryption;
 use Mastercard\Developer\Encryption\RSA\RSA;
 use Mastercard\Developer\Encryption\EncryptionException;
 use Mastercard\Developer\Utils\EncodingUtils;
+use phpseclib3\Crypt\AES;
 
 
 class JweObject
@@ -18,9 +20,6 @@ class JweObject
     private string $iv;
     private string $cipherText;
     private string $authTag;
-
-    // private static const A128CBC_HS256 = "A128CBC-HS256";
-    // private static const A256GCM = "A256GCM";
 
     private function __construct(JweHeader $header, string $rawHeader, string $encryptedKey, string $iv, string $cipherText, string $authTag)
     {
@@ -55,6 +54,40 @@ class JweObject
             default:
                 throw new EncryptionException(sprintf("Encryption method %s not supported", $encryptionMethod));
         }
+    }
+
+    public static function encrypt(JweConfig $config, string $payload, JweHeader $header): string
+    {
+        $cek = AESEncryption::generateCek(256)['key'];
+
+        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate(), $cek);
+        $encryptedKey = EncodingUtils::base64UrlEncode($encryptedSecretKeyBytes);
+
+        $iv = AESEncryption::generateIv();
+
+        $headerString = $header->toJSON();
+        $encodedHeader = EncodingUtils::base64UrlEncode($headerString);
+
+        $cipher = new AES('gcm');
+        $cipher->setNonce($iv);
+        $cipher->setKey($cek);
+        $cipher->disablePadding();
+        $cipher->setAAD($encodedHeader);
+        $cipherText = $cipher->encrypt($payload);
+        $authTag = $cipher->getTag();
+
+        return self::serialize(
+            $encodedHeader,
+            $encryptedKey,
+            EncodingUtils::base64UrlEncode($iv),
+            EncodingUtils::base64UrlEncode($cipherText),
+            EncodingUtils::base64UrlEncode($authTag)
+        );
+    }
+
+    private static function serialize(string $header, string $encryptedKey, string $iv, string $cipherText, string $authTag)
+    {
+        return "$header.$encryptedKey.$iv.$cipherText.$authTag";
     }
 
     public static function parse(string $encryptedPayload): JweObject

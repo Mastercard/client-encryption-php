@@ -17,7 +17,7 @@ class JweHeader
         $this->cty = $cty;
     }
 
-    public function toJson()
+    public function toJSON()
     {
         $obj = [];
 
