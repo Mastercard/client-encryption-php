@@ -2,9 +2,9 @@
 
 namespace Mastercard\Developer\Encryption;
 
+use Mastercard\Developer\Encryption\AES\AESCBC;
 use Mastercard\Developer\Json\JsonPath;
 use Mastercard\Developer\Utils\EncodingUtils;
-use phpseclib\Crypt\AES;
 
 /**
  * Performs field level encryption on HTTP payloads.
@@ -101,7 +101,7 @@ class FieldLevelEncryption {
 
         // Encrypt data at the given JSON path
         $inJsonString = self::sanitizeJson(self::toJsonString($inJsonObject));
-        $encryptedValueBytes = self::encryptBytes($params->getSecretKeyBytes(), $params->getIvBytes(), $inJsonString);
+        $encryptedValueBytes = AESCBC::encrypt($params->getIvBytes(), $params->getSecretKeyBytes(), $inJsonString);
         $encryptedValue = EncodingUtils::encodeBytes($encryptedValueBytes, $config->getFieldValueEncoding());
 
         // Delete data in clear
@@ -172,7 +172,7 @@ class FieldLevelEncryption {
 
         // Decrypt data
         $encryptedValueBytes = EncodingUtils::decodeValue($encryptedValueJsonElement, $config->getFieldValueEncoding());
-        $decryptedValueBytes = self::decryptBytes($params->getSecretKeyBytes(), $params->getIvBytes(), $encryptedValueBytes);
+        $decryptedValueBytes = AESCBC::decrypt($params->getIvBytes(), $params->getSecretKeyBytes(), $encryptedValueBytes);
 
         // Add decrypted data at the given JSON path
         $decryptedValue = self::sanitizeJson($decryptedValueBytes);
@@ -283,42 +283,6 @@ class FieldLevelEncryption {
         $value = $object->$key;
         unset($object->$key);
         return $value;
-    }
-
-    /**
-     * @param string $key
-     * @param string $iv
-     * @param string $bytes
-     * @throws EncryptionException
-     * @return string
-     */
-    private static function encryptBytes($key, $iv, $bytes) {
-        $aes = new AES();
-        $aes->setKey($key);
-        $aes->setIV($iv);
-        $encryptedBytes = $aes->encrypt($bytes);
-        if (false === $encryptedBytes) {
-            throw new EncryptionException('Failed to encrypt bytes!');
-        }
-        return $encryptedBytes;
-    }
-
-    /**
-     * @param string $key
-     * @param string $iv
-     * @param string $encryptedBytes
-     * @throws EncryptionException
-     * @return string
-     */
-    private static function decryptBytes($key, $iv, $encryptedBytes) {
-        $aes = new AES();
-        $aes->setKey($key);
-        $aes->setIV($iv);
-        $bytes = $aes->decrypt($encryptedBytes);
-        if (false === $bytes) {
-            throw new EncryptionException('Failed to decrypt bytes with the provided key and IV!');
-        }
-        return $bytes;
     }
 
     /**

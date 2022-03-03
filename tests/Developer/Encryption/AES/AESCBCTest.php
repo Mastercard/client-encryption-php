@@ -18,4 +18,34 @@ class AESCBCTest extends TestCase
 
         $this->assertEquals("bar", $result);
     }
+
+    public function testEncryptBytes_InteroperabilityTest() {
+        // GIVEN
+        $ivValue = 'VNm/scgd1jhWF0z4+Qh6MA==';
+        $keyValue = 'mZzmzoURXI3Vk0vdsPkcFw==';
+        $dataValue = 'some data ù€@';
+
+        // WHEN
+        $encryptedBytes = AESCBC::encrypt(base64_decode($ivValue), base64_decode($keyValue), $dataValue);
+
+        // THEN
+        $expectedEncryptedBytes = base64_decode('Y6X9YneTS4VuPETceBmvclrDoCqYyBgZgJUdnlZ8/0g=');
+        $this->assertEquals($expectedEncryptedBytes, $encryptedBytes);
+    }
+
+    public function testDecryptBytes_InteroperabilityTest() {
+        // GIVEN
+        $ivValue = 'VNm/scgd1jhWF0z4+Qh6MA==';
+        $keyValue = 'mZzmzoURXI3Vk0vdsPkcFw==';
+        $encryptedDataValue = 'Y6X9YneTS4VuPETceBmvclrDoCqYyBgZgJUdnlZ8/0g=';
+
+        // WHEN
+        $decryptedBytes = AESCBC::decrypt(base64_decode($ivValue), base64_decode($keyValue), base64_decode($encryptedDataValue));
+
+        // THEN
+        $expectedBytes = 'some data ù€@';
+        $this->assertEquals($expectedBytes, $decryptedBytes);
+    }
+
+
 }

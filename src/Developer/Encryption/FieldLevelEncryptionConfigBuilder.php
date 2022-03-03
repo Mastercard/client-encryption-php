@@ -23,6 +23,7 @@ class FieldLevelEncryptionConfigBuilder {
     private $encryptionCertificateFingerprint;
     private $encryptionKeyFingerprint;
     private $decryptionKey;
+    private $decryptionKeyPassword = false;
     private $encryptionPaths = array();
     private $decryptionPaths = array();
     private $oaepPaddingDigestAlgorithm;
@@ -82,8 +83,9 @@ class FieldLevelEncryptionConfigBuilder {
      * @see FieldLevelEncryptionConfig::decryptionKey.
      * @return $this
      */
-    public function withDecryptionKey($decryptionKey) {
+    public function withDecryptionKey($decryptionKey, $password = false) {
         $this->decryptionKey = $decryptionKey;
+        $this->decryptionKeyPassword = $password;
         return $this;
     }
 
@@ -260,6 +262,7 @@ class FieldLevelEncryptionConfigBuilder {
             $this->encryptionCertificateFingerprint,
             $this->encryptionKeyFingerprint,
             $this->decryptionKey,
+            $this->decryptionKeyPassword,
             $this->encryptionPaths,
             $this->decryptionPaths,
             $this->oaepPaddingDigestAlgorithm,

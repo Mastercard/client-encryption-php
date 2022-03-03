@@ -34,10 +34,16 @@ class FieldLevelEncryptionConfig {
     private $encryptionKeyFingerprint;
 
     /**
-     * A private key object to be used for decryption.
-     * @var OpenSSLAsymmetricKey|resource
+     * A private key string to be used for decryption.
+     * @var string
      */
     private $decryptionKey;
+
+    /**
+     * A private key password to be used for decryption.
+     * @var string|false
+     */
+    private $decryptionKeyPassword = false;
 
     /**
      * A list of JSON paths to encrypt in request payloads.
@@ -168,7 +174,8 @@ class FieldLevelEncryptionConfig {
      * @param OpenSSLCertificate|resource|string $encryptionCertificate
      * @param string                             $encryptionCertificateFingerprint
      * @param string                             $encryptionKeyFingerprint
-     * @param OpenSSLAsymmetricKey|resource      $decryptionKey
+     * @param string                             $decryptionKey
+     * @param string|false                       $decryptionKeyPassword
      * @param array                              $encryptionPaths
      * @param array                              $decryptionPaths
      * @param string                             $oaepPaddingDigestAlgorithm
@@ -185,11 +192,12 @@ class FieldLevelEncryptionConfig {
      * @param string|null                        $encryptionKeyFingerprintHeaderName
      * @param int                                $fieldValueEncoding
      */
-    public function __construct($encryptionCertificate, $encryptionCertificateFingerprint, $encryptionKeyFingerprint, $decryptionKey, $encryptionPaths, $decryptionPaths, $oaepPaddingDigestAlgorithm, $oaepPaddingDigestAlgorithmFieldName, $oaepPaddingDigestAlgorithmHeaderName, $ivFieldName, $ivHeaderName, $encryptedKeyFieldName, $encryptedKeyHeaderName, $encryptedValueFieldName, $encryptionCertificateFingerprintFieldName, $encryptionCertificateFingerprintHeaderName, $encryptionKeyFingerprintFieldName, $encryptionKeyFingerprintHeaderName, $fieldValueEncoding) {
+    public function __construct($encryptionCertificate, $encryptionCertificateFingerprint, $encryptionKeyFingerprint, $decryptionKey, $decryptionKeyPassword,$encryptionPaths, $decryptionPaths, $oaepPaddingDigestAlgorithm, $oaepPaddingDigestAlgorithmFieldName, $oaepPaddingDigestAlgorithmHeaderName, $ivFieldName, $ivHeaderName, $encryptedKeyFieldName, $encryptedKeyHeaderName, $encryptedValueFieldName, $encryptionCertificateFingerprintFieldName, $encryptionCertificateFingerprintHeaderName, $encryptionKeyFingerprintFieldName, $encryptionKeyFingerprintHeaderName, $fieldValueEncoding) {
         $this->encryptionCertificate = $encryptionCertificate;
         $this->encryptionCertificateFingerprint = $encryptionCertificateFingerprint;
         $this->encryptionKeyFingerprint = $encryptionKeyFingerprint;
         $this->decryptionKey = $decryptionKey;
+        $this->decryptionKeyPassword = $decryptionKeyPassword;
         $this->encryptionPaths = $encryptionPaths;
         $this->decryptionPaths = $decryptionPaths;
         $this->oaepPaddingDigestAlgorithm = $oaepPaddingDigestAlgorithm;
@@ -233,6 +241,13 @@ class FieldLevelEncryptionConfig {
      */
     public function getDecryptionKey() {
         return $this->decryptionKey;
+    }
+
+    /**
+     * @return string|false
+     */
+    public function getDecryptionKeyPassword() {
+        return $this->decryptionKeyPassword;
     }
 
     /**

@@ -1,7 +1,6 @@
 <?php
 
 namespace Mastercard\Developer\Encryption;
-use Error;
 use Exception;
 use Mastercard\Developer\Encryption\RSA\RSA;
 use Mastercard\Developer\Utils\EncodingUtils;
@@ -52,7 +51,6 @@ class FieldLevelEncryptionParams {
         $secretKey = openssl_random_pseudo_bytes(self::SYMMETRIC_KEY_SIZE / 8);
 
         // Encrypt the secret key
-        // $encryptedSecretKeyBytes = self::wrapSecretKey($config, $secretKey);
         $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate(), $secretKey);
         $encryptedKeyValue = EncodingUtils::encodeBytes($encryptedSecretKeyBytes, $config->getFieldValueEncoding());
 
@@ -114,7 +112,7 @@ class FieldLevelEncryptionParams {
             }
             // Decrypt the AES secret key
             $encryptedSecretKeyBytes = EncodingUtils::decodeValue($this->encryptedKeyValue, $this->config->getFieldValueEncoding());
-            $this->secretKey = RSA::unwrapSecretKey($this->config->getDecryptionKey(), $encryptedSecretKeyBytes, $this->oaepPaddingDigestAlgorithmValue);
+            $this->secretKey = RSA::unwrapSecretKey($this->config->getDecryptionKey(), $encryptedSecretKeyBytes, $this->oaepPaddingDigestAlgorithmValue, $this->config->getDecryptionKeyPassword());
             return $this->secretKey;
         } catch (EncryptionException $e) {
             throw $e;
