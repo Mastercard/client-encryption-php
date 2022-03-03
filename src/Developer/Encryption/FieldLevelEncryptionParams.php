@@ -2,6 +2,7 @@
 
 namespace Mastercard\Developer\Encryption;
 use Exception;
+use Mastercard\Developer\Encryption\AES\AESEncryption;
 use Mastercard\Developer\Encryption\RSA\RSA;
 use Mastercard\Developer\Utils\EncodingUtils;
 
@@ -43,12 +44,11 @@ class FieldLevelEncryptionParams {
     public static function generate($config) {
 
         // Generate a random IV
-        $ivLength = openssl_cipher_iv_length(self::SYMMETRIC_CYPHER);
-        $iv = openssl_random_pseudo_bytes($ivLength);
+        $iv = AESEncryption::generateIv();
         $ivValue = EncodingUtils::encodeBytes($iv, $config->getFieldValueEncoding());
 
         // Generate an AES secret key
-        $secretKey = openssl_random_pseudo_bytes(self::SYMMETRIC_KEY_SIZE / 8);
+        $secretKey = AESEncryption::generateCek(self::SYMMETRIC_KEY_SIZE);
 
         // Encrypt the secret key
         $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate(), $secretKey);

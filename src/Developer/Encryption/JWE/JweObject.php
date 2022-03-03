@@ -58,7 +58,7 @@ class JweObject
 
     public static function encrypt(JweConfig $config, string $payload, JweHeader $header): string
     {
-        $cek = AESEncryption::generateCek(256)['key'];
+        $cek = AESEncryption::generateCek(256);
 
         $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate(), $cek);
         $encryptedKey = EncodingUtils::base64UrlEncode($encryptedSecretKeyBytes);
