@@ -208,7 +208,7 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return OpenSSLCertificate|resource|string
+     * @return string
      */
     public function getEncryptionCertificate() {
         return $this->encryptionCertificate;
@@ -229,7 +229,7 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return OpenSSLAsymmetricKey|resource
+     * @return string
      */
     public function getDecryptionKey() {
         return $this->decryptionKey;

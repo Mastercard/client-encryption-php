@@ -3,8 +3,8 @@
 namespace Mastercard\Developer\Encryption;
 use Error;
 use Exception;
+use Mastercard\Developer\Encryption\RSA\RSA;
 use Mastercard\Developer\Utils\EncodingUtils;
-use phpseclib\Crypt\RSA;
 
 /**
  * Encryption parameters for computing field level encryption/decryption.
@@ -52,7 +52,8 @@ class FieldLevelEncryptionParams {
         $secretKey = openssl_random_pseudo_bytes(self::SYMMETRIC_KEY_SIZE / 8);
 
         // Encrypt the secret key
-        $encryptedSecretKeyBytes = self::wrapSecretKey($config, $secretKey);
+        // $encryptedSecretKeyBytes = self::wrapSecretKey($config, $secretKey);
+        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate(), $secretKey);
         $encryptedKeyValue = EncodingUtils::encodeBytes($encryptedSecretKeyBytes, $config->getFieldValueEncoding());
 
         // Compute the OAEP padding digest algorithm
@@ -113,7 +114,7 @@ class FieldLevelEncryptionParams {
             }
             // Decrypt the AES secret key
             $encryptedSecretKeyBytes = EncodingUtils::decodeValue($this->encryptedKeyValue, $this->config->getFieldValueEncoding());
-            $this->secretKey = self::unwrapSecretKey($this->config, $encryptedSecretKeyBytes, $this->oaepPaddingDigestAlgorithmValue);
+            $this->secretKey = RSA::unwrapSecretKey($this->config->getDecryptionKey(), $encryptedSecretKeyBytes, $this->oaepPaddingDigestAlgorithmValue);
             return $this->secretKey;
         } catch (EncryptionException $e) {
             throw $e;
@@ -122,73 +123,4 @@ class FieldLevelEncryptionParams {
         }
     }
 
-    /**
-     * @param FieldLevelEncryptionConfig $config
-     * @param string                     $keyBytes
-     * @return string
-     * @throws EncryptionException
-     */
-    private static function wrapSecretKey($config, $keyBytes) {
-        try {
-            $encryptionCertificate = $config->getEncryptionCertificate();
-            $publicKey = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate));
-            $rsa = self::getRsa($config->getOaepPaddingDigestAlgorithm(), $publicKey['key'], RSA::PUBLIC_FORMAT_PKCS1);
-            return $rsa->encrypt($keyBytes);
-        } catch (Error $e) { // Needed for PHP 5.6 compatibility, both cases should be caught with Throwable from PHP 7.0
-            throw new EncryptionException('Failed to wrap secret key!', $e);
-        } catch (Exception $e) {
-            throw new EncryptionException('Failed to wrap secret key!', $e);
-        }
-    }
-
-    /**
-     * @param FieldLevelEncryptionConfig $config
-     * @param string                     $wrappedKeyBytes
-     * @param string                     $oaepPaddingDigestAlgorithm
-     * @return string
-     * @throws EncryptionException
-     */
-    private static function unwrapSecretKey($config, $wrappedKeyBytes, $oaepPaddingDigestAlgorithm) {
-        try {
-            $decryptionKey = $config->getDecryptionKey();
-            $rawPrivateKey = openssl_pkey_get_details($decryptionKey)['rsa'];
-            $rsa = self::getRsa($oaepPaddingDigestAlgorithm, self::toDsigXmlPrivateKey($rawPrivateKey), RSA::PRIVATE_FORMAT_XML);
-            return $rsa->decrypt($wrappedKeyBytes);
-        } catch (Exception $e) {
-            throw new EncryptionException('Failed to unwrap secret key!', $e);
-        }
-    }
-
-    /**
-     * @param string    $oaepPaddingDigestAlgorithm
-     * @param string    $key
-     * @param int|false $type
-     * @return RSA
-     */
-    private static function getRsa($oaepPaddingDigestAlgorithm, $key, $type) {
-        $rsa = new RSA();
-        $rsa->setEncryptionMode(RSA::ENCRYPTION_OAEP);
-        $hash = strtolower(str_replace('-', '', $oaepPaddingDigestAlgorithm));
-        $rsa->setMGFHash($hash);
-        $rsa->setHash($hash);
-        $rsa->loadKey($key, $type);
-        return $rsa;
-    }
-
-    /**
-     * @param array $raw
-     * @return string
-     */
-    private static function toDsigXmlPrivateKey($raw) {
-        return "<RSAKeyValue>\r\n" .
-            '  <Modulus>' . base64_encode($raw['n']) . "</Modulus>\r\n" .
-            '  <Exponent>' . base64_encode($raw['e']) . "</Exponent>\r\n" .
-            '  <P>' . base64_encode($raw['p']) . "</P>\r\n" .
-            '  <Q>' . base64_encode($raw['q']) . "</Q>\r\n" .
-            '  <DP>' . base64_encode($raw['dmp1']) . "</DP>\r\n" .
-            '  <DQ>' . base64_encode($raw['dmq1']) . "</DQ>\r\n" .
-            '  <InverseQ>' . base64_encode($raw['iqmp']) . "</InverseQ>\r\n" .
-            '  <D>' . base64_encode($raw['d']) . "</D>\r\n" .
-            '</RSAKeyValue>';
-    }
 }

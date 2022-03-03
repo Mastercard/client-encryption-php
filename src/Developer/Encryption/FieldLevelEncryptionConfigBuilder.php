@@ -6,7 +6,7 @@ use Mastercard\Developer\Json\JsonPath;
 use Mastercard\Developer\Utils\EncodingUtils;
 use OpenSSLAsymmetricKey;
 use OpenSSLCertificate;
-use phpseclib\Crypt\Hash;
+use phpseclib3\Crypt\Hash;
 
 /**
  * A builder class for FieldLevelEncryptionConfig.

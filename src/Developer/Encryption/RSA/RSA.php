@@ -10,22 +10,24 @@ class RSA
     public static function wrapSecretKey(string $publicKey, string $toWrap, string $oaepDigestAlgorithm = 'sha256')
     {
         $asymmetricKey = PublicKeyLoader::load($publicKey);
+        $hash = strtolower(str_replace('-', '', $oaepDigestAlgorithm));
 
         return $asymmetricKey
-            ->withHash($oaepDigestAlgorithm)
+            ->withHash($hash)
             ->withPadding(CryptRSA::ENCRYPTION_OAEP)
-            ->withMGFHash($oaepDigestAlgorithm)
+            ->withMGFHash($hash)
             ->encrypt($toWrap);
     }
 
     public static function unwrapSecretKey(string $decryptionKey, string $wrapped, string $oaepDigestAlgorithm = 'sha256')
     {
         $asymmetricKey = PublicKeyLoader::load($decryptionKey);
+        $hash = strtolower(str_replace('-', '', $oaepDigestAlgorithm));
 
         return $asymmetricKey
-            ->withHash($oaepDigestAlgorithm)
+            ->withHash($hash)
             ->withPadding(CryptRSA::ENCRYPTION_OAEP)
-            ->withMGFHash($oaepDigestAlgorithm)
+            ->withMGFHash($hash)
             ->decrypt($wrapped);
     }
 }
