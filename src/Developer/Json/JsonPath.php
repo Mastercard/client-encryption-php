@@ -66,7 +66,10 @@ class JsonPath {
                 return null;
             }
             $childKey = $matches[1];
-            if (!property_exists($currentElement, $childKey)) {
+            if (!is_array($currentElement) && !property_exists($currentElement, $childKey)) {
+                return null;
+            }
+            if (is_array($currentElement) && empty($currentElement[$childKey])){
                 return null;
             }
             $currentElement = $currentElement->$childKey;
