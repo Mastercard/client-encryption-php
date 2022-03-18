@@ -6,7 +6,7 @@ use Mastercard\Developer\Encryption\JWE\JweHeader;
 use Mastercard\Developer\Encryption\JWE\JweObject;
 use Mastercard\Developer\Json\JsonPath;
 use Mastercard\Developer\Json\JsonUtils;
-use Mastercard\Developer\Utils\EncodingUtils;
+use JsonPath\JsonObject;
 
 class JweEncryption {
 
@@ -45,7 +45,6 @@ class JweEncryption {
         }
     }
 
-
     /**
      * Decrypt parts of a JSON payload using the given parameters and configuration.
      * @param string                          $payload A JSON string
@@ -55,17 +54,24 @@ class JweEncryption {
      */
     public static function decryptPayload($payload, $config) {
         try {
-            // Parse the given payload
-            $payloadJsonObject = json_decode($payload);
+            $jsonObject = new JsonObject($payload, true);
 
-            
+            $ret = new JsonObject();
+        
             // Perform decryption (if needed)
             foreach ($config->getDecryptionPaths() as $jsonPathIn => $jsonPathOut) {
-                $payloadJsonObject = self::decryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config);
+                $inJsonObject = $jsonObject->get($jsonPathIn);
+
+                if (is_null($inJsonObject)){
+                    continue;
+                }
+
+                $jweObject = JweObject::parse($inJsonObject);
+                $ret->set($jsonPathOut, json_decode($jweObject->decrypt($config)));
             }
 
             // Return the updated payload
-            return json_encode($payloadJsonObject);
+            return $ret->getJson();
         } catch (\InvalidArgumentException $e) {
             throw $e;
         } catch (EncryptionException $e) {
@@ -74,7 +80,6 @@ class JweEncryption {
             throw new EncryptionException('Payload decryption failed!', $e);
         }
     }
-
 
     /**
      * @param \stdClass                       $payloadJsonObject
@@ -85,6 +90,7 @@ class JweEncryption {
      */    
     private static function encryptPayloadPath($payloadJsonObject, string $jsonPathIn, string $jsonPathOut, JweConfig $config){
         $inJsonObject = JsonPath::find($payloadJsonObject, $jsonPathIn);
+        
         if (is_null($inJsonObject)) {
             // Nothing to encrypt
             return $payloadJsonObject;
@@ -107,43 +113,4 @@ class JweEncryption {
 
         return $payloadJsonObject;
     }
-
-    /**
-     * @param \stdClass                       $payloadJsonObject
-     * @param string                          $jsonPathIn
-     * @param string                          $jsonPathOut
-     * @param JweConfig                       $config
-     * @throws EncryptionException
-     */
-    private static function decryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config) {
-        $inJsonObject = JsonUtils::readJsonElement($payloadJsonObject, $jsonPathIn);
-        if (is_null($inJsonObject)) {
-            // Nothing to encrypt
-            return $payloadJsonObject;
-        }
-
-        $jweObject = JweObject::parse($inJsonObject);
-        $decryptedValueBytes = $jweObject->decrypt($config);
-
-        // Add decrypted data at the given JSON path
-        $decryptedValue = JsonUtils::sanitize($decryptedValueBytes);
-        $outJsonObject = JsonUtils::checkOrCreateOutObject($payloadJsonObject, $jsonPathOut);
-        $payloadJsonObject = JsonUtils::addDecryptedDataToPayload($payloadJsonObject, $jsonPathOut, $outJsonObject, $decryptedValue);
-
-        // Remove the input if now empty
-        $inJsonElement = JsonUtils::readJsonElement($payloadJsonObject, $jsonPathIn);
-        if (empty((array)$inJsonElement) && '$' !== $jsonPathIn) {
-            JsonPath::delete($payloadJsonObject, $jsonPathIn);
-        }
-        return $payloadJsonObject;
-    }
-
-    // private static readAndDeleteJsonKey(DocumentContext context, \stdClass $obj, string $key) {
-    //     context.delete(key);
-    //     return object;
-    // }
-
-    // private static Object readJsonObject(DocumentContext context, String jsonPathString) {
-    //     return readJsonElement(context, jsonPathString);
-    // }
 }

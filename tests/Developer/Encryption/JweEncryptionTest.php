@@ -54,4 +54,34 @@ class JweEncryptionTest extends TestCase {
         // THEN
         $this->assertJsonStringEqualsJsonString("[{},{}]", $decrypedPayload);
     }
+
+    public function testSample()
+    {
+        $encryptionCerificate = file_get_contents(__DIR__ . "/../../resources/certificates/test_certificate-2048.pem");
+        $decryptionKey = file_get_contents(__DIR__ . "/../../resources/keys/pkcs8/test_key_pkcs8-2048.pem");
+
+        $config = JweConfigBuilder::aJweEncryptionConfig()
+            ->withEncryptionCertificate($encryptionCerificate)
+            ->withDecryptionKey($decryptionKey)
+            ->withEncryptionPath("$.path.to.foo", "$.path.to.encryptedFoo")
+            ->withDecryptionPath("$.path.to.encryptedFoo.encryptedData", "$.path.to.foo")
+            ->build();
+
+        $payload = "{" .
+            "    \"path\": {" .
+            "        \"to\": {" .
+            "            \"foo\": {" .
+            "                \"sensitiveField1\": \"sensitiveValue1\"," .
+            "                \"sensitiveField2\": \"sensitiveValue2\"" .
+            "            }" .
+            "        }" .
+            "    }" .
+            "}";
+
+        $encryptedPayload = JweEncryption::encryptPayload($payload, $config);
+
+        $decryptedPayload = JweEncryption::decryptPayload($encryptedPayload, $config);
+
+        $this->assertEquals(json_encode(json_decode($payload)), $decryptedPayload);
+    }
 }
