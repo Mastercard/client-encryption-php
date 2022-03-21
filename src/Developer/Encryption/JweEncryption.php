@@ -67,7 +67,11 @@ class JweEncryption {
                 }
 
                 $jweObject = JweObject::parse($inJsonObject);
-                $ret->set($jsonPathOut, json_decode($jweObject->decrypt($config)));
+                
+                $decryptedPayload = $jweObject->decrypt($config);
+                $parsedPayload = json_decode($decryptedPayload);
+
+                $ret->set($jsonPathOut, json_last_error() === JSON_ERROR_NONE ? $parsedPayload : $decryptedPayload );
             }
 
             // Return the updated payload

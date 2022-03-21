@@ -1,31 +1,20 @@
 <?php
+
 namespace Mastercard\Developer\Interceptors;
 
-use Mastercard\Developer\Encryption\EncryptionException;
-use Mastercard\Developer\Encryption\FieldLevelEncryption;
-use Mastercard\Developer\Encryption\FieldLevelEncryptionConfig;
-use Mastercard\Developer\Encryption\FieldLevelEncryptionParams;
-use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+
+use Mastercard\Developer\Encryption\EncryptionException;
 
 /**
  * Utility class for encrypting RequestInterface and decrypting ResponseInterface payloads (see: https://www.php-fig.org/psr/psr-7/)
  * @package Mastercard\Developer\Interceptors
  */
-class PsrHttpMessageEncryptionInterceptor {
-    /**
-     * @var FieldLevelEncryptionConfig
-     */
-    private $config;
-
-    /**
-     * PsrHttpMessageEncryptionInterceptor constructor.
-     * @param FieldLevelEncryptionConfig $config A FieldLevelEncryptionConfig instance
-     */
-    public function __construct($config) {
-        $this->config = $config;
-    }
+abstract class PsrHttpMessageEncryptionInterceptor
+{
+    abstract public function encryptPayload(RequestInterface &$request, $requestPayload);
+    abstract public function decryptPayload(ResponseInterface &$response, $responsePayload);
 
     /**
      * Encrypt payloads from RequestInterface objects when needed.
@@ -33,9 +22,9 @@ class PsrHttpMessageEncryptionInterceptor {
      * @return RequestInterface The updated RequestInterface object
      * @throws EncryptionException
      */
-    public function interceptRequest(RequestInterface &$request) {
+    public function interceptRequest(RequestInterface &$request)
+    {
         try {
-            // Check request actually has a payload
             $body = $request->getBody();
             $payload = $body->__toString();
             if (empty($payload)) {
@@ -43,20 +32,7 @@ class PsrHttpMessageEncryptionInterceptor {
                 return $request;
             }
 
-            // Encrypt fields & update headers
-            if ($this->config->useHttpHeaders()) {
-                // Generate encryption params and add them as HTTP headers
-                $params = FieldLevelEncryptionParams::generate($this->config);
-                self::updateHeader($request, $this->config->getIvHeaderName(), $params->getIvValue());
-                self::updateHeader($request, $this->config->getEncryptedKeyHeaderName(), $params->getEncryptedKeyValue());
-                self::updateHeader($request, $this->config->getEncryptionCertificateFingerprintHeaderName(), $this->config->getEncryptionCertificateFingerprint());
-                self::updateHeader($request, $this->config->getEncryptionKeyFingerprintHeaderName(), $this->config->getEncryptionKeyFingerprint());
-                self::updateHeader($request, $this->config->getOaepPaddingDigestAlgorithmHeaderName(), $params->getOaepPaddingDigestAlgorithmValue());
-                $encryptedPayload = FieldLevelEncryption::encryptPayload($payload, $this->config, $params);
-            } else {
-                // Encryption params will be stored in the payload
-                $encryptedPayload = FieldLevelEncryption::encryptPayload($payload, $this->config);
-            }
+            $encryptedPayload = $this->encryptPayload($request, $payload);
 
             // Update body and content length
             $updatedBody = new PsrStreamInterfaceImpl();
@@ -64,10 +40,9 @@ class PsrHttpMessageEncryptionInterceptor {
             $request = $request->withBody($updatedBody);
             self::updateHeader($request, 'Content-Length', $updatedBody->getSize());
             return $request;
-
         } catch (EncryptionException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw new EncryptionException('Failed to intercept and encrypt request!', $e);
         }
     }
@@ -78,9 +53,9 @@ class PsrHttpMessageEncryptionInterceptor {
      * @return ResponseInterface The updated ResponseInterface object
      * @throws EncryptionException
      */
-    public function interceptResponse(ResponseInterface &$response) {
+    public function interceptResponse(ResponseInterface &$response)
+    {
         try {
-            // Read response payload
             $body = $response->getBody();
             $payload = $body->__toString();
             if (empty($payload)) {
@@ -88,20 +63,7 @@ class PsrHttpMessageEncryptionInterceptor {
                 return $response;
             }
 
-            // Decrypt fields & update headers
-            if ($this->config->useHttpHeaders()) {
-                // Read encryption params from HTTP headers and delete headers
-                $ivValue = self::readAndRemoveHeader($response, $this->config->getIvHeaderName());
-                $encryptedKeyValue = self::readAndRemoveHeader($response, $this->config->getEncryptedKeyHeaderName());
-                $oaepPaddingDigestAlgorithmValue = self::readAndRemoveHeader($response, $this->config->getOaepPaddingDigestAlgorithmHeaderName());
-                self::readAndRemoveHeader($response, $this->config->getEncryptionCertificateFingerprintHeaderName());
-                self::readAndRemoveHeader($response, $this->config->getEncryptionKeyFingerprintHeaderName());
-                $params = new FieldLevelEncryptionParams($this->config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue);
-                $decryptedPayload = FieldLevelEncryption::decryptPayload($payload, $this->config, $params);
-            } else {
-                // Encryption params are stored in the payload
-                $decryptedPayload = FieldLevelEncryption::decryptPayload($payload, $this->config);
-            }
+            $decryptedPayload = $this->decryptPayload($response, $payload);
 
             // Update body and content length
             $updatedBody = new PsrStreamInterfaceImpl();
@@ -109,11 +71,10 @@ class PsrHttpMessageEncryptionInterceptor {
             $response = $response->withBody($updatedBody);
             self::updateHeader($response, 'Content-Length', $updatedBody->getSize());
             return $response;
-
         } catch (EncryptionException $e) {
             throw $e;
-        } catch (\Exception $e) {
-            throw new EncryptionException('Failed to intercept and decrypt response!', $e);
+        } catch (\Throwable $e) {
+            throw new EncryptionException('Failed to intercept and encrypt request!', $e);
         }
     }
 
@@ -122,29 +83,12 @@ class PsrHttpMessageEncryptionInterceptor {
      * @param string           $name
      * @param string           $value
      */
-    private static function updateHeader(&$message, $name, $value) {
+    protected static function updateHeader(&$message, $name, $value)
+    {
         if (empty($name)) {
             // Do nothing
             return $message;
         }
         $message = $message->withHeader($name, $value);
-    }
-
-    /**
-     * @param MessageInterface $message
-     * @param string           $name
-     *
-     * @return string|null
-     */
-    private static function readAndRemoveHeader(&$message, $name) {
-        if (empty($name)) {
-            return null;
-        }
-        if (!$message->hasHeader($name)) {
-            return null;
-        }
-        $values = $message->getHeader($name);
-        $message = $message->withoutHeader($name);
-        return $values[0];
     }
 }
