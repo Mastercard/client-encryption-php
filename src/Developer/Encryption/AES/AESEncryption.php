@@ -9,7 +9,12 @@ class AESEncryption
         // Nothing to do here
     }
 
-    public static function generateIv(string $cipher_algo = 'AES-128-CBC')
+
+    /**
+     * @param string            $cipher_algo
+     * @return string 
+     */    
+    public static function generateIv($cipher_algo = 'AES-128-CBC')
     {
         $ivLength = openssl_cipher_iv_length($cipher_algo);
         $iv = openssl_random_pseudo_bytes($ivLength);
@@ -17,7 +22,11 @@ class AESEncryption
         return $iv;
     }
 
-    public static function generateCek(int $bitLength)
+    /**
+     * @param int            $bitLength
+     * @return string 
+     */    
+    public static function generateCek($bitLength)
     {
         return openssl_random_pseudo_bytes($bitLength / 8);
     }

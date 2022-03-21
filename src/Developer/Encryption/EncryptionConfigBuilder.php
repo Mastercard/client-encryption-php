@@ -6,16 +6,38 @@ use Mastercard\Developer\Json\JsonPath;
 
 abstract class EncryptionConfigBuilder
 {
+    /**
+     * @var string
+     */
     protected $encryptionCertificate;
-    protected string|null $encryptionKeyFingerprint = null;
-    protected string|null $decryptionKey = null;
-    // FieldLevelEncryptionConfig.FieldValueEncoding fieldValueEncoding;
-    protected array $encryptionPaths = [];
-    protected array $decryptionPaths = [];
-    protected string|null $encryptedValueFieldName = null;
 
+    /**
+     * @var string|null
+     */
+    protected $encryptionKeyFingerprint = null;
 
-    protected function computeEncryptionKeyFingerprintWhenNeeded() {
+    /**
+     * @var string|null
+     */
+    protected $decryptionKey = null;
+
+    /**
+     * @var array
+     */
+    protected $encryptionPaths = [];
+
+    /**
+     * @var array
+     */
+    protected $decryptionPaths = [];
+
+    /**
+     * @var string|null
+     */
+    protected $encryptedValueFieldName = null;
+
+    protected function computeEncryptionKeyFingerprintWhenNeeded()
+    {
         try {
             if ($this->encryptionCertificate == null || isset($this->encryptionKeyFingerprint)) {
                 // No encryption certificate set or key fingerprint already provided
@@ -29,15 +51,16 @@ abstract class EncryptionConfigBuilder
         }
     }
 
-    protected function checkJsonPathParameterValues() {
-        foreach($this->decryptionPaths as $key=>$value) {
-            if (!JsonPath::isPathDefinite($key) || !JsonPath::isPathDefinite($value)){
+    protected function checkJsonPathParameterValues()
+    {
+        foreach ($this->decryptionPaths as $key => $value) {
+            if (!JsonPath::isPathDefinite($key) || !JsonPath::isPathDefinite($value)) {
                 throw new \InvalidArgumentException("JSON paths for decryption must point to a single item!");
             }
         }
 
-        foreach($this->encryptionPaths as $key=>$value) {
-            if (!JsonPath::isPathDefinite($key) || !JsonPath::isPathDefinite($value)){
+        foreach ($this->encryptionPaths as $key => $value) {
+            if (!JsonPath::isPathDefinite($key) || !JsonPath::isPathDefinite($value)) {
                 throw new \InvalidArgumentException("JSON paths for decryption must point to a single item!");
             }
         }

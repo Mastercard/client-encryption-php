@@ -10,7 +10,15 @@ class AESGCM
     {
     }
 
-    public static function decrypt(string $iv, string $key, string $authTag, string $aad, string $cipherText)
+    /**
+     * @param string $iv
+     * @param string $key
+     * @param string $authTag
+     * @param string $aad
+     * @param string $cipherText
+     * @return string
+     */
+    public static function decrypt($iv, $key, $authTag, $aad, $cipherText)
     {
         $cipher = new AES('gcm');
         $cipher->setNonce($iv);

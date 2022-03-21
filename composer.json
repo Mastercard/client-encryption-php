@@ -25,7 +25,7 @@
     "require-dev": {
         "guzzlehttp/guzzle": "^6.2",
         "yoast/phpunit-polyfills": "^1.0",
-        "phake/phake": "^4.2"
+        "phake/phake": "*"
     },
     "suggest": {
         "psr/http-message": "Allow usage of the PsrHttpMessageEncryptionInterceptor class"

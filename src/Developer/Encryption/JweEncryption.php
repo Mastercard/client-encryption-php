@@ -12,9 +12,9 @@ class JweEncryption {
 
     private function __construct() { }
 
-    private const ALGORITHM = "RSA-OAEP-256";
-    private const ENCRYPTION = "A256GCM";
-    private const CONTENT_TYPE = "application/json";
+    const ALGORITHM = "RSA-OAEP-256";
+    const ENCRYPTION = "A256GCM";
+    const CONTENT_TYPE = "application/json";
 
 
     /**
@@ -24,7 +24,7 @@ class JweEncryption {
      * @return string The updated payload
      * @throws EncryptionException
      */    
-    public static function encryptPayload(string $payload, JweConfig $config): string {
+    public static function encryptPayload($payload, $config) {
         try {
             // Parse the given payload
             $payloadJsonObject = json_decode($payload);
@@ -80,7 +80,7 @@ class JweEncryption {
             throw $e;
         } catch (EncryptionException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw new EncryptionException('Payload decryption failed!', $e);
         }
     }
@@ -92,7 +92,7 @@ class JweEncryption {
      * @param JweConfig                       $config
      * @throws EncryptionException
      */    
-    private static function encryptPayloadPath($payloadJsonObject, string $jsonPathIn, string $jsonPathOut, JweConfig $config){
+    private static function encryptPayloadPath($payloadJsonObject, $jsonPathIn, $jsonPathOut, $config){
         $inJsonObject = JsonPath::find($payloadJsonObject, $jsonPathIn);
         
         if (is_null($inJsonObject)) {

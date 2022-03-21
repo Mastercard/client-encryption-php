@@ -13,6 +13,11 @@ class EncodingUtils
     }
 
 
+    /**
+     * @param string            $data 
+     * @param bool              $strict 
+     * @return string|false
+     */
     public static function base64UrlDecode($data, $strict = false)
     {
         // Convert Base64URL to Base64 by replacing “-” with “+” and “_” with “/”
@@ -22,7 +27,11 @@ class EncodingUtils
         return base64_decode($b64, $strict);
     }
 
-    public static function base64UrlEncode(string $text): string
+    /**
+     * @param string            $text 
+     * @return string
+     */
+    public static function base64UrlEncode($text)
     {
         return str_replace(
             ['+', '/', '='],

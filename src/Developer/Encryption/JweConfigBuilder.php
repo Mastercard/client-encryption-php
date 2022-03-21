@@ -5,18 +5,20 @@ namespace Mastercard\Developer\Encryption;
 class JweConfigBuilder extends EncryptionConfigBuilder {
 
     /**
+     * @return JweConfigBuilder 
      * Get an instance of the builder.
      */
-    public static function aJweEncryptionConfig(): JweConfigBuilder {
+    public static function aJweEncryptionConfig() {
         return new JweConfigBuilder();
     }
 
     /**
+     * @return JweConfig 
      * Build a {@link JweConfig}.
      *
      * @throws EncryptionException
      */
-    public function build(): JweConfig {
+    public function build() {
         $this->checkParameterValues();
         $this->computeEncryptionKeyFingerprintWhenNeeded();
         $this->checkJsonPathParameterValues();
@@ -32,41 +34,53 @@ class JweConfigBuilder extends EncryptionConfigBuilder {
     }
 
     /**
+     * @param string $encryptionCertificate
+     * @return JweConfigBuilder 
      * See: {@link EncryptionConfig#encryptionCertificate}.
      */
-    public function withEncryptionCertificate($encryptionCertificate): JweConfigBuilder {
+    public function withEncryptionCertificate($encryptionCertificate) {
         $this->encryptionCertificate = $encryptionCertificate;
         return $this;
     }
 
     /**
+     * @param string $decryptionKey
+     * @return JweConfigBuilder 
      * See: {@link EncryptionConfig#decryptionKey}.
      */
-    public function withDecryptionKey($decryptionKey): JweConfigBuilder {
+    public function withDecryptionKey($decryptionKey) {
         $this->decryptionKey = $decryptionKey;
         return $this;
     }
 
     /**
+     * @param string $jsonPathIn
+     * @param string $jsonPathOut
+     * @return JweConfigBuilder 
      * See: {@link EncryptionConfig#encryptionPaths}.
      */
-    public function withEncryptionPath(string $jsonPathIn, string $jsonPathOut): JweConfigBuilder {
+    public function withEncryptionPath($jsonPathIn, $jsonPathOut) {
         $this->encryptionPaths[$jsonPathIn] = $jsonPathOut;
         return $this;
     }
 
     /**
+     * @param string $jsonPathIn
+     * @param string $jsonPathOut
+     * @return JweConfigBuilder 
      * See: {@link EncryptionConfig#decryptionPaths}.
      */
-    public function withDecryptionPath(string $jsonPathIn, string $jsonPathOut): JweConfigBuilder {
+    public function withDecryptionPath($jsonPathIn, $jsonPathOut) {
         $this->decryptionPaths[$jsonPathIn] = $jsonPathOut;
         return $this;
     }
 
     /**
+     * @param string $encryptedValueFieldName
+     * @return JweConfigBuilder 
      * See: {@link EncryptionConfig#encryptedValueFieldName}.
      */
-    public function withEncryptedValueFieldName(string $encryptedValueFieldName): JweConfigBuilder {
+    public function withEncryptedValueFieldName($encryptedValueFieldName) {
         $this->encryptedValueFieldName = $encryptedValueFieldName;
         return $this;
     }

@@ -13,23 +13,27 @@ abstract class EncryptionConfig
     protected $scheme = EncryptionConfigScheme::LEGACY;
 
     /**
+     * @var string|null
      * The SHA-256 hex-encoded digest of the key used for encryption (optional, the digest will be
      * automatically computed if this field is null or empty).
      * Example: "c3f8ef7053c4fb306f7476e7d1956f0aa992ff9dfdd5244b912a1d377ff3a84f"
      */
-    protected string|null $encryptionKeyFingerprint = null;
+    protected $encryptionKeyFingerprint = null;
 
     /**
+     * @var string
      * A certificate object whose public key will be used for encryption.
      */
     protected $encryptionCertificate;
 
     /**
+     * @var string|null
      * A private key object to be used for decryption.
      */
-    protected string|null $decryptionKey = null;
+    protected $decryptionKey = null;
 
     /**
+     * @var array
      * A list of JSON paths to encrypt in request payloads.
      * Example:
      * <pre>
@@ -40,9 +44,10 @@ abstract class EncryptionConfig
      * }
      * </pre>
      */
-    private array $encryptionPaths = [];
+    private $encryptionPaths = [];
 
     /**
+     * @var array
      * A list of JSON paths to decrypt in response payloads.
      * Example:
      * <pre>
@@ -53,76 +58,118 @@ abstract class EncryptionConfig
      * }
      * </pre>
      */
-    private array $decryptionPaths = [];
+    private $decryptionPaths = [];
 
     /**
+     * @var string|null
      * The name of the payload field where to write/read the encrypted data value.
      */
     protected $encryptedValueFieldName = null;
 
-    public function getEncryptionKeyFingerprint(): string|null
+    /**
+     * @return string|null
+     */
+    public function getEncryptionKeyFingerprint()
     {
         return $this->encryptionKeyFingerprint;
     }
 
+    /**
+     * @return string
+     */    
     public function getEncryptionCertificate()
     {
         return $this->encryptionCertificate;
     }
 
-    public function getDecryptionKey(): string
+    /**
+     * @return string
+     */
+    public function getDecryptionKey()
     {
         return $this->decryptionKey;
     }
 
-    public function getScheme(): int
+    /**
+     * @return int
+     */    
+    public function getScheme()
     {
         return $this->scheme;
     }
 
-    public function setEncryptionKeyFingerprint(string|null $encryptionKeyFingerprint)
+    /**
+     * @return array
+     */    
+    public function getEncryptionPaths()
+    {
+        return $this->encryptionPaths;
+    }
+
+    /**
+     * @return array
+     */    
+    public function getDecryptionPaths()
+    {
+        return $this->decryptionPaths;
+    }
+
+    /**
+     * @return string
+     */    
+    public function getEncryptedValueFieldName()
+    {
+        return $this->encryptedValueFieldName;
+    }    
+
+    /**
+     * @param string|null $encryptionKeyFingerprint 
+     */    
+    public function setEncryptionKeyFingerprint($encryptionKeyFingerprint)
     {
         $this->encryptionKeyFingerprint = $encryptionKeyFingerprint;
     }
 
+    /**
+     * @param string $encryptionCertificate 
+     */    
     public function setEncryptionCertificate($encryptionCertificate)
     {
         $this->encryptionCertificate = $encryptionCertificate;
     }
 
-    public function setDecryptionKey(string|null $decryptionKey)
+    /**
+     * @param string|null $decryptionKey 
+     */    
+    public function setDecryptionKey($decryptionKey)
     {
         $this->decryptionKey = $decryptionKey;
     }
 
+    /**
+     * @param string $encryptedValueFieldName 
+     */    
     public function setEncryptedValueFieldName($encryptedValueFieldName)
     {
         $this->encryptedValueFieldName = $encryptedValueFieldName;
     }
 
-    public function setEncryptionPaths(array $encryptionPaths)
+    /**
+     * @param array $encryptionPaths
+     */    
+    public function setEncryptionPaths($encryptionPaths)
     {
         $this->encryptionPaths = $encryptionPaths;
     }
 
-    public function setDecryptionPaths(array $decryptionPaths)
+    /**
+     * @param array $decryptionPaths
+     */    
+    public function setDecryptionPaths($decryptionPaths)
     {
         $this->decryptionPaths = $decryptionPaths;
     }
 
-    public function getEncryptionPaths(): array
-    {
-        return $this->encryptionPaths;
-    }
 
-    public function getDecryptionPaths(): array
-    {
-        return $this->decryptionPaths;
-    }
-
-    public function getEncryptedValueFieldName(): string
-    {
-        return $this->encryptedValueFieldName;
-    }
     
 }

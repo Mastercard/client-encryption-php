@@ -166,6 +166,8 @@ class PsrHttpMessageJweInterceptorTest extends TestCase
 
     public function testInterceptResponse_ShouldThrowEncryptionException_WhenDecryptionFails()
     {
+        $this->expectException(EncryptionException::class);
+        $this->expectExceptionMessage('Invalid payload');
 
         // GIVEN
         $encryptedPayload = '{
@@ -181,10 +183,6 @@ class PsrHttpMessageJweInterceptorTest extends TestCase
 
         $headers = ['Content-Type' => 'application/json'];
         $response = new Response(200, $headers, $encryptedPayload);
-
-        // THEN
-        $this->expectException(EncryptionException::class);
-        $this->expectExceptionMessage('Failed to intercept and encrypt request!');
 
         // WHEN
         $instanceUnderTest = new PsrHttpMessageJweInterceptor($config);

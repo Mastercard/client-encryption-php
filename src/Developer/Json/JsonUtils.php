@@ -7,7 +7,7 @@ class JsonUtils{
      * @param string $json
      * @return string
      */
-    public static function sanitize(string $json) {
+    public static function sanitize($json) {
         $json = str_replace("\n", '', $json);
         $json = str_replace("\r", '', $json);
         $json = str_replace("\t", '', $json);

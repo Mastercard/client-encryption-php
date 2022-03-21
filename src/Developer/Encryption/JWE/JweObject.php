@@ -14,14 +14,45 @@ use phpseclib3\Crypt\AES;
 
 class JweObject
 {
-    private JweHeader $header;
-    private string $rawHeader;
-    private string $encryptedKey;
-    private string $iv;
-    private string $cipherText;
-    private string $authTag;
+    /**
+     * @var JweHeader
+     */
+    private $header;
 
-    private function __construct(JweHeader $header, string $rawHeader, string $encryptedKey, string $iv, string $cipherText, string $authTag)
+    /**
+     * @var string
+     */
+    private $rawHeader;
+
+    /**
+     * @var string
+     */
+    private $encryptedKey;
+
+    /**
+     * @var string
+     */
+    private $iv;
+
+    /**
+     * @var string
+     */
+    private $cipherText;
+
+    /**
+     * @var string
+     */
+    private $authTag;
+
+    /**
+     * @param JweHeader $rawHeader 
+     * @param string $rawHeader 
+     * @param string $encryptedKey
+     * @param string $iv
+     * @param string $cipherText
+     * @param string $authTag
+     */
+    private function __construct($header, $rawHeader, $encryptedKey, $iv, $cipherText, $authTag)
     {
         $this->header = $header;
         $this->rawHeader = $rawHeader;
@@ -31,7 +62,12 @@ class JweObject
         $this->authTag = $authTag;
     }
 
-    public function decrypt(JweConfig $config)
+    /**
+     * @param JweConfig $config 
+     * @return string 
+     * @throws EncryptionException
+     */
+    public function decrypt($config)
     {
         $cek = RSA::unwrapSecretKey($config->getDecryptionKey(), EncodingUtils::base64UrlDecode($this->getEncryptedKey()));
         $encryptionMethod = $this->header->getEnc();
@@ -56,7 +92,14 @@ class JweObject
         }
     }
 
-    public static function encrypt(JweConfig $config, string $payload, JweHeader $header): string
+    /**
+     * @param JweConfig $config 
+     * @param string $payload 
+     * @param JweHeader $header 
+     * @return string 
+     * @throws EncryptionException
+     */
+    public static function encrypt($config, $payload, $header)
     {
         $cek = AESEncryption::generateCek(256);
 
@@ -85,14 +128,32 @@ class JweObject
         );
     }
 
-    private static function serialize(string $header, string $encryptedKey, string $iv, string $cipherText, string $authTag)
+    /**
+     * @param string $header 
+     * @param string $encryptedKey
+     * @param string $iv
+     * @param string $cipherText
+     * @param string $authTag
+     * @return string 
+     */
+    private static function serialize($header, $encryptedKey, $iv, $cipherText, $authTag)
     {
         return "$header.$encryptedKey.$iv.$cipherText.$authTag";
     }
 
-    public static function parse(string $encryptedPayload): JweObject
+    /**
+     * @param string $encryptedPayload 
+     * @return JweObject 
+     */
+    public static function parse($encryptedPayload)
     {
         $t = trim($encryptedPayload);
+        
+        if (substr_count($t, '.') != 4)
+        {
+            throw new EncryptionException("Invalid payload");
+        }
+
         $dot1 = strpos($t, '.');
         $dot2 = strpos($t, '.', $dot1 + 1);
         $dot3 = strpos($t, '.', $dot2 + 1);
@@ -110,37 +171,58 @@ class JweObject
         );
     }
 
-    public function getHeader(): JweHeader
+    /**
+     * @return JweObject 
+     */
+    public function getHeader()
     {
         return $this->header;
     }
 
-    public function getRawHeader(): string
+    /**
+     * @return string
+     */
+    public function getRawHeader()
     {
         return $this->rawHeader;
     }
 
-    private function getEncryptedKey(): string
+    /**
+     * @return string
+     */
+    private function getEncryptedKey()
     {
         return $this->encryptedKey;
     }
 
-    public function getIv(): string
+    /**
+     * @return string
+     */
+    public function getIv()
     {
         return $this->iv;
     }
 
-    public function getCipherText(): string
+    /**
+     * @return string
+     */
+    public function getCipherText()
     {
         return $this->cipherText;
     }
 
-    public function getAuthTag(): string
+    /**
+     * @return string
+     */
+    public function getAuthTag()
     {
         return $this->authTag;
     }
 
-    public function toJSON(): string
+    /**
+     * @return string
+     */
+    public function toJSON()
     {
         return json_encode([
             "header" => json_decode($this->header->toJSON()),
