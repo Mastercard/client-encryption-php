@@ -6,8 +6,8 @@ use PHPUnit\Framework\TestCase;
 class JweConfigBuilderTest extends TestCase
 {
     public function testBuild_Nominal() {
-        $encryptionCerificate = file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem");
-        $decryptionKey = file_get_contents(__DIR__ . "/../../../resources/keys/pkcs8/test_key_pkcs8-2048.pem");
+        $encryptionCerificate = file_get_contents("./resources/Certificates/test_certificate-2048.pem");
+        $decryptionKey = file_get_contents("./resources/Keys/Pkcs8/test_key_pkcs8-2048.pem");
 
         $config = JweConfigBuilder::aJweEncryptionConfig()
             ->withEncryptionCertificate($encryptionCerificate)
@@ -27,8 +27,8 @@ class JweConfigBuilderTest extends TestCase
     }
 
     public function testBuild_ResultShouldBeAssignableToGenericEncryptionConfig() {
-        $encryptionCerificate = file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem");
-        $decryptionKey = file_get_contents(__DIR__ . "/../../../resources/keys/pkcs8/test_key_pkcs8-2048.pem");
+        $encryptionCerificate = file_get_contents("./resources/Certificates/test_certificate-2048.pem");
+        $decryptionKey = file_get_contents("./resources/Keys/Pkcs8/test_key_pkcs8-2048.pem");
 
         $config = JweConfigBuilder::aJweEncryptionConfig()
             ->withEncryptionCertificate($encryptionCerificate)
@@ -39,8 +39,8 @@ class JweConfigBuilderTest extends TestCase
     }
 
     public function testBuild_ShouldComputeCertificateKeyFingerprint_WhenFingerprintNotSet() {
-        $encryptionCerificate = file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem");
-        $decryptionKey = file_get_contents(__DIR__ . "/../../../resources/keys/pkcs8/test_key_pkcs8-2048.pem");
+        $encryptionCerificate = file_get_contents("./resources/Certificates/test_certificate-2048.pem");
+        $decryptionKey = file_get_contents("./resources/Keys/Pkcs8/test_key_pkcs8-2048.pem");
 
         $config = JweConfigBuilder::aJweEncryptionConfig()
             ->withEncryptionCertificate($encryptionCerificate)
@@ -61,7 +61,7 @@ class JweConfigBuilderTest extends TestCase
     }
 
     public function testBuild_ShouldFallbackToDefaults() {
-        $encryptionCerificate = file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem");
+        $encryptionCerificate = file_get_contents("./resources/Certificates/test_certificate-2048.pem");
 
         $config = JweConfigBuilder::aJweEncryptionConfig()
                 ->withEncryptionCertificate($encryptionCerificate)
@@ -76,7 +76,7 @@ class JweConfigBuilderTest extends TestCase
         $this->expectException("\InvalidArgumentException");
         $this->expectExceptionMessage("JSON paths for decryption must point to a single item!");
 
-        $decryptionKey = file_get_contents(__DIR__ . "/../../../resources/keys/pkcs8/test_key_pkcs8-2048.pem");
+        $decryptionKey = file_get_contents("./resources/Keys/Pkcs8/test_key_pkcs8-2048.pem");
         
         JweConfigBuilder::aJweEncryptionConfig()
             ->withDecryptionPath("$.encryptedPayloads[*]", "$.payload")
@@ -88,7 +88,7 @@ class JweConfigBuilderTest extends TestCase
         $this->expectException("\InvalidArgumentException");
         $this->expectExceptionMessage("JSON paths for decryption must point to a single item!");
 
-        $encryptionCerificate = file_get_contents(__DIR__ . "/../../../resources/certificates/test_certificate-2048.pem");
+        $encryptionCerificate = file_get_contents("./resources/Certificates/test_certificate-2048.pem");
 
         JweConfigBuilder::aJweEncryptionConfig()
             ->withEncryptionPath("$.payloads[*]", "$.encryptedPayload")

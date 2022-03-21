@@ -20,7 +20,7 @@ class TestUtils {
     }
 
     public static function getTestEncryptionCertificate() {
-        return file_get_contents(__DIR__ . "/../../resources/certificates/test_certificate-2048.pem");
+        return file_get_contents("./resources/Certificates/test_certificate-2048.pem");
         // EncryptionUtils::loadEncryptionCertificate(dirname(dirname(dirname(__DIR__))).'/resources/Certificates/test_certificate-2048.pem');
     }
 
@@ -29,7 +29,7 @@ class TestUtils {
     }
 
     public static function getTestDecryptionKey() {
-        return file_get_contents(__DIR__ . "/../../resources/keys/pkcs8/test_key_pkcs8-2048.der");
+        return file_get_contents("./resources/Keys/Pkcs8/test_key_pkcs8-2048.der");
         // EncryptionUtils::loadDecryptionKey(dirname(dirname(dirname(__DIR__))).'/resources/Keys/Pkcs8/test_key_pkcs8-2048.der');
     }
 
