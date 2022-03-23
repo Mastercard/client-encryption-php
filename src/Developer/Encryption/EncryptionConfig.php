@@ -2,6 +2,9 @@
 
 namespace Mastercard\Developer\Encryption;
 
+use Mastercard\Developer\Keys\DecryptionKey;
+use Mastercard\Developer\Keys\EncryptionKey;
+
 abstract class EncryptionConfig
 {
     /**
@@ -21,16 +24,16 @@ abstract class EncryptionConfig
     protected $encryptionKeyFingerprint = null;
 
     /**
-     * @var string
+     * @var EncryptionKey
      * A certificate object whose public key will be used for encryption.
      */
     protected $encryptionCertificate;
 
     /**
-     * @var string|null
+     * @var DecryptionKey
      * A private key object to be used for decryption.
      */
-    protected $decryptionKey = null;
+    protected $decryptionKey;
 
     /**
      * @var array
@@ -75,7 +78,7 @@ abstract class EncryptionConfig
     }
 
     /**
-     * @return string
+     * @return EncryptionKey
      */    
     public function getEncryptionCertificate()
     {
@@ -83,7 +86,7 @@ abstract class EncryptionConfig
     }
 
     /**
-     * @return string
+     * @return DecryptionKey
      */
     public function getDecryptionKey()
     {

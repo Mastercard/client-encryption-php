@@ -2,8 +2,8 @@
 
 namespace Mastercard\Developer\Encryption;
 
-use OpenSSLAsymmetricKey;
-use OpenSSLCertificate;
+use Mastercard\Developer\Keys\DecryptionKey;
+use Mastercard\Developer\Keys\EncryptionKey;
 
 /**
  * A class for storing the encryption/decryption configuration.
@@ -13,7 +13,7 @@ class FieldLevelEncryptionConfig {
 
     /**
      * A certificate object whose public key will be used for encryption.
-     * @var OpenSSLCertificate|resource|string
+     * @var EncryptionKey
      */
     private $encryptionCertificate;
 
@@ -35,15 +35,10 @@ class FieldLevelEncryptionConfig {
 
     /**
      * A private key string to be used for decryption.
-     * @var string
+     * @var DecryptionKey
      */
     private $decryptionKey;
 
-    /**
-     * A private key password to be used for decryption.
-     * @var string|false
-     */
-    private $decryptionKeyPassword = false;
 
     /**
      * A list of JSON paths to encrypt in request payloads.
@@ -171,11 +166,10 @@ class FieldLevelEncryptionConfig {
     /**
      * FieldLevelEncryptionConfig constructor.
      *
-     * @param OpenSSLCertificate|resource|string $encryptionCertificate
+     * @param EncryptionKey                      $encryptionCertificate
      * @param string                             $encryptionCertificateFingerprint
      * @param string                             $encryptionKeyFingerprint
-     * @param string                             $decryptionKey
-     * @param string|false                       $decryptionKeyPassword
+     * @param DecryptionKey                      $decryptionKey
      * @param array                              $encryptionPaths
      * @param array                              $decryptionPaths
      * @param string                             $oaepPaddingDigestAlgorithm
@@ -192,12 +186,11 @@ class FieldLevelEncryptionConfig {
      * @param string|null                        $encryptionKeyFingerprintHeaderName
      * @param int                                $fieldValueEncoding
      */
-    public function __construct($encryptionCertificate, $encryptionCertificateFingerprint, $encryptionKeyFingerprint, $decryptionKey, $decryptionKeyPassword,$encryptionPaths, $decryptionPaths, $oaepPaddingDigestAlgorithm, $oaepPaddingDigestAlgorithmFieldName, $oaepPaddingDigestAlgorithmHeaderName, $ivFieldName, $ivHeaderName, $encryptedKeyFieldName, $encryptedKeyHeaderName, $encryptedValueFieldName, $encryptionCertificateFingerprintFieldName, $encryptionCertificateFingerprintHeaderName, $encryptionKeyFingerprintFieldName, $encryptionKeyFingerprintHeaderName, $fieldValueEncoding) {
+    public function __construct($encryptionCertificate, $encryptionCertificateFingerprint, $encryptionKeyFingerprint, $decryptionKey, $encryptionPaths, $decryptionPaths, $oaepPaddingDigestAlgorithm, $oaepPaddingDigestAlgorithmFieldName, $oaepPaddingDigestAlgorithmHeaderName, $ivFieldName, $ivHeaderName, $encryptedKeyFieldName, $encryptedKeyHeaderName, $encryptedValueFieldName, $encryptionCertificateFingerprintFieldName, $encryptionCertificateFingerprintHeaderName, $encryptionKeyFingerprintFieldName, $encryptionKeyFingerprintHeaderName, $fieldValueEncoding) {
         $this->encryptionCertificate = $encryptionCertificate;
         $this->encryptionCertificateFingerprint = $encryptionCertificateFingerprint;
         $this->encryptionKeyFingerprint = $encryptionKeyFingerprint;
         $this->decryptionKey = $decryptionKey;
-        $this->decryptionKeyPassword = $decryptionKeyPassword;
         $this->encryptionPaths = $encryptionPaths;
         $this->decryptionPaths = $decryptionPaths;
         $this->oaepPaddingDigestAlgorithm = $oaepPaddingDigestAlgorithm;
@@ -216,7 +209,7 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return string
+     * @return EncryptionKey
      */
     public function getEncryptionCertificate() {
         return $this->encryptionCertificate;
@@ -237,17 +230,10 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return string
+     * @return DecryptionKey
      */
     public function getDecryptionKey() {
         return $this->decryptionKey;
-    }
-
-    /**
-     * @return string|false
-     */
-    public function getDecryptionKeyPassword() {
-        return $this->decryptionKeyPassword;
     }
 
     /**

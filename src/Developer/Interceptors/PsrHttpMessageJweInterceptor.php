@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
  * Utility class for encrypting RequestInterface and decrypting ResponseInterface payloads (see: https://www.php-fig.org/psr/psr-7/)
  * @package Mastercard\Developer\Interceptors
  */
-class PsrHttpMessageJweInterceptor extends PsrHttpMessageEncryptionInterceptor
+class PsrHttpMessageJweInterceptor extends PsrHttpMessageEncryptionAbstractInterceptor
 {
     /**
      * @var JweConfig

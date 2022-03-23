@@ -16,7 +16,7 @@ class RSA
      * @throws EncryptionException
      */
     public static function wrapSecretKey($publicKey, $toWrap, $oaepDigestAlgorithm = 'sha256')
-    {
+    {        
         $hash = strtolower(str_replace('-', '', $oaepDigestAlgorithm));
 
         try {

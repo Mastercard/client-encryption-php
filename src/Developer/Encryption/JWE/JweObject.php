@@ -69,7 +69,7 @@ class JweObject
      */
     public function decrypt($config)
     {
-        $cek = RSA::unwrapSecretKey($config->getDecryptionKey(), EncodingUtils::base64UrlDecode($this->getEncryptedKey()));
+        $cek = RSA::unwrapSecretKey($config->getDecryptionKey()->getBytes(), EncodingUtils::base64UrlDecode($this->getEncryptedKey()));
         $encryptionMethod = $this->header->getEnc();
 
         switch ($encryptionMethod) {
@@ -103,7 +103,7 @@ class JweObject
     {
         $cek = AESEncryption::generateCek(256);
 
-        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate(), $cek);
+        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate()->getBytes(), $cek);
         $encryptedKey = EncodingUtils::base64UrlEncode($encryptedSecretKeyBytes);
 
         $iv = AESEncryption::generateIv();

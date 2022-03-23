@@ -3,6 +3,7 @@
 namespace Mastercard\Developer\Encryption;
 
 use InvalidArgumentException;
+use Mastercard\Developer\Keys\DecryptionKey;
 use Mastercard\Developer\Test\TestUtils;
 use Mastercard\Developer\Utils\StringUtils;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +19,7 @@ class FieldLevelEncryptionTest extends TestCase {
         // GIVEN
         $encryptedPayload = '{"data":"WtBPYHL5jdU/BsECYzlyRUPIElWCwSCgKhk5RPy2AMZBGmC8OUJ1L9HC/SF2QpCU+ucZTmo7XOjhSdVi0/yrdZP1OG7dVWcW4MEWpxiU1gl0fS0LKKPOFjEymSP5f5otdTFCp00xPfzp+l6K3S3kZTAuSG1gh6TaRL+qfC1POz8KxhCEL8D1MDvxnlmchPx/hEyAzav0AID3T7T4WomzUXErNrnbDCCiL6pm4IBR8cDAzU4eSmTxdzZFyvTpBQDXVyFdkaNTo3GXk837wujVK8EX3c+gsJvMq4XVJFwGmPNhPM6P7OmdK45cldWrD5j2gO2VBH5aW1EXfot7d11bjJC9T8D/ZOQFF6uLIG7J9x9R0Ts0zXD/H24y9/jF30rKKX7TNmKHn5uh1Czd+h7ryIAqaQsOu6ILBKfH7W/NIR5qYN1GiL/kOYwx2pdIGQdcdolVdxV8Z6bt4Tcvq3jSZaCbhJI/kphZL7QHJgcG6luz9k0457x/0QCDPlve6JNgUQzAOYC64X0a07JpERH0O08/YbntKEq6qf7UhloyI5A="}';
         $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
-            ->withDecryptionKey(file_get_contents('./resources/Keys/Pkcs1/test_key_pkcs1-2048.pem'))
+            ->withDecryptionKey(DecryptionKey::load('./resources/Keys/Pkcs1/test_key_pkcs1-2048.pem'))
             ->withDecryptionPath('$', '$')
             ->withEncryptedValueFieldName('data')
             ->withFieldValueEncoding(FieldValueEncoding::BASE64)
@@ -1178,7 +1179,7 @@ class FieldLevelEncryptionTest extends TestCase {
             ->withDecryptionPath('encryptedData', 'data')
             ->withOaepPaddingDigestAlgorithm('SHA-256')
             // Not the right key
-            ->withDecryptionKey(\file_get_contents("./resources/Keys/Pkcs12/test_key.p12"), 'Password1')
+            ->withDecryptionKey(DecryptionKey::load("./resources/Keys/Pkcs12/test_key.p12", null, 'Password1'))
             ->build();
 
         // THEN

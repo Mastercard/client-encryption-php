@@ -3,11 +3,13 @@
 namespace Mastercard\Developer\Encryption;
 
 use Mastercard\Developer\Json\JsonPath;
+use Mastercard\Developer\Keys\DecryptionKey;
+use Mastercard\Developer\Keys\EncryptionKey;
 
 abstract class EncryptionConfigBuilder
 {
     /**
-     * @var string
+     * @var EncryptionKey
      */
     protected $encryptionCertificate;
 
@@ -17,9 +19,9 @@ abstract class EncryptionConfigBuilder
     protected $encryptionKeyFingerprint = null;
 
     /**
-     * @var string|null
+     * @var DecryptionKey
      */
-    protected $decryptionKey = null;
+    protected $decryptionKey;
 
     /**
      * @var array
@@ -44,7 +46,7 @@ abstract class EncryptionConfigBuilder
                 return;
             }
 
-            $cert = openssl_x509_read($this->encryptionCertificate);
+            $cert = openssl_x509_read($this->encryptionCertificate->getBytes());
             $this->encryptionKeyFingerprint = openssl_x509_fingerprint($cert, 'sha256');
         } catch (\Exception $e) {
             throw new EncryptionException("Failed to compute encryption key fingerprint!", $e);

@@ -4,6 +4,8 @@ namespace Mastercard\Developer\Test;
 
 use Mastercard\Developer\Encryption\FieldLevelEncryptionConfigBuilder;
 use Mastercard\Developer\Encryption\FieldValueEncoding;
+use Mastercard\Developer\Keys\DecryptionKey;
+use Mastercard\Developer\Keys\EncryptionKey;
 use Mastercard\Developer\Utils\EncryptionUtils;
 use ReflectionClass;
 
@@ -20,15 +22,15 @@ class TestUtils {
     }
 
     public static function getTestEncryptionCertificate() {
-        return file_get_contents("./resources/Certificates/test_certificate-2048.pem");
+        return EncryptionKey::load("./resources/Certificates/test_certificate-2048.pem");
     }
 
     public static function getTestInvalidEncryptionCertificate() {
-        return "not a certificate!";
+        return EncryptionKey::create("not a certificate!");
     }
 
     public static function getTestDecryptionKey() {
-        return file_get_contents("./resources/Keys/Pkcs8/test_key_pkcs8-2048.der");
+        return DecryptionKey::load("./resources/Keys/Pkcs8/test_key_pkcs8-2048.der");
     }
 
     public static function getTestFieldLevelEncryptionConfigBuilder() {

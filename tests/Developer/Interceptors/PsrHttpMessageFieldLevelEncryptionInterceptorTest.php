@@ -9,7 +9,7 @@ use Mastercard\Developer\Utils\StringUtils;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\Request; // GuzzleHttp requests are implementing the PSR RequestInterface
 
-class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
+class PsrHttpMessageEncryptionInterceptorTest extends TestCase
 {
 
     public function testInterceptRequest_ShouldEncryptRequestPayloadAndUpdateContentLengthHeader()
@@ -24,7 +24,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $request = new Request('POST', 'https://api.mastercard.com/service', $headers, $payload);
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $outRequest = $instanceUnderTest->interceptRequest($request);
 
         // THEN
@@ -47,7 +47,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $initialHeaderCount = sizeof($request->getHeaders());
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $outRequest = $instanceUnderTest->interceptRequest($request);
 
         // THEN
@@ -73,7 +73,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $this->expectExceptionMessage('Failed to wrap secret key!');
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $instanceUnderTest->interceptRequest($request);
     }
 
@@ -97,7 +97,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $request = new Request('POST', 'https://api.mastercard.com/service', $headers, $payload);
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $outRequest = $instanceUnderTest->interceptRequest($request);
 
         // THEN
@@ -134,7 +134,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $response = new Response(200, $headers, $encryptedPayload);
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $outResponse = $instanceUnderTest->interceptResponse($response);
 
         // THEN
@@ -153,7 +153,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $response = new Response(200);
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $outResponse = $instanceUnderTest->interceptResponse($response);
 
         // THEN
@@ -184,7 +184,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $this->expectExceptionMessage('Failed to decode and unwrap the provided secret key value!');
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $instanceUnderTest->interceptResponse($response);
     }
 
@@ -216,7 +216,7 @@ class PsrHttpMessageFieldLevelEncryptionInterceptorTest extends TestCase
         $response = new Response(200, $headers, $encryptedPayload);
 
         // WHEN
-        $instanceUnderTest = new PsrHttpMessageFieldLevelEncryptionInterceptor($config);
+        $instanceUnderTest = new PsrHttpMessageEncryptionInterceptor($config);
         $outResponse = $instanceUnderTest->interceptResponse($response);
 
         // THEN

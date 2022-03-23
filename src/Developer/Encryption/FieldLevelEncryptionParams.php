@@ -42,7 +42,6 @@ class FieldLevelEncryptionParams {
      * @throws EncryptionException
      */
     public static function generate($config) {
-
         // Generate a random IV
         $iv = AESEncryption::generateIv();
         $ivValue = EncodingUtils::encodeBytes($iv, $config->getFieldValueEncoding());
@@ -51,7 +50,7 @@ class FieldLevelEncryptionParams {
         $secretKey = AESEncryption::generateCek(self::SYMMETRIC_KEY_SIZE);
 
         // Encrypt the secret key
-        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate(), $secretKey);
+        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate()->getBytes(), $secretKey);
         $encryptedKeyValue = EncodingUtils::encodeBytes($encryptedSecretKeyBytes, $config->getFieldValueEncoding());
 
         // Compute the OAEP padding digest algorithm
@@ -112,7 +111,8 @@ class FieldLevelEncryptionParams {
             }
             // Decrypt the AES secret key
             $encryptedSecretKeyBytes = EncodingUtils::decodeValue($this->encryptedKeyValue, $this->config->getFieldValueEncoding());
-            $this->secretKey = RSA::unwrapSecretKey($this->config->getDecryptionKey(), $encryptedSecretKeyBytes, $this->oaepPaddingDigestAlgorithmValue, $this->config->getDecryptionKeyPassword());
+            $decryptionKey = $this->config->getDecryptionKey();
+            $this->secretKey = RSA::unwrapSecretKey($decryptionKey->getBytes(), $encryptedSecretKeyBytes, $this->oaepPaddingDigestAlgorithmValue, $decryptionKey->getPassword());
             return $this->secretKey;
         } catch (EncryptionException $e) {
             throw $e;

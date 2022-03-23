@@ -2,93 +2,90 @@
 
 namespace Mastercard\Developer\Interceptors;
 
+use Mastercard\Developer\Encryption\FieldLevelEncryption;
+use Mastercard\Developer\Encryption\FieldLevelEncryptionConfig;
+use Mastercard\Developer\Encryption\FieldLevelEncryptionParams;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-
-use Mastercard\Developer\Encryption\EncryptionException;
 
 /**
  * Utility class for encrypting RequestInterface and decrypting ResponseInterface payloads (see: https://www.php-fig.org/psr/psr-7/)
  * @package Mastercard\Developer\Interceptors
  */
-abstract class PsrHttpMessageEncryptionInterceptor
+class PsrHttpMessageEncryptionInterceptor extends PsrHttpMessageEncryptionAbstractInterceptor
 {
-    abstract public function encryptPayload(RequestInterface &$request, $requestPayload);
-    abstract public function decryptPayload(ResponseInterface &$response, $responsePayload);
+    /**
+     * @var FieldLevelEncryptionConfig
+     */
+    private $config;
 
     /**
-     * Encrypt payloads from RequestInterface objects when needed.
-     * @param RequestInterface $request A RequestInterface object
-     * @return RequestInterface The updated RequestInterface object
-     * @throws EncryptionException
+     * PsrHttpMessageEncryptionInterceptor constructor.
+     * @param FieldLevelEncryptionConfig $config A FieldLevelEncryptionConfig instance
      */
-    public function interceptRequest(RequestInterface &$request)
+    public function __construct($config)
     {
-        try {
-            $body = $request->getBody();
-            $payload = $body->__toString();
-            if (empty($payload)) {
-                // Nothing to encrypt
-                return $request;
-            }
-
-            $encryptedPayload = $this->encryptPayload($request, $payload);
-
-            // Update body and content length
-            $updatedBody = new PsrStreamInterfaceImpl();
-            $updatedBody->write($encryptedPayload);
-            $request = $request->withBody($updatedBody);
-            self::updateHeader($request, 'Content-Length', $updatedBody->getSize());
-            return $request;
-        } catch (EncryptionException $e) {
-            throw $e;
-        } catch (\Throwable $e) {
-            throw new EncryptionException('Failed to intercept and encrypt request!', $e);
-        }
+        $this->config = $config;
     }
 
-    /**
-     * Decrypt payloads from ResponseInterface objects when needed.
-     * @param ResponseInterface $response A ResponseInterface object
-     * @return ResponseInterface The updated ResponseInterface object
-     * @throws EncryptionException
-     */
-    public function interceptResponse(ResponseInterface &$response)
+
+    public function encryptPayload(RequestInterface &$request, $requestPayload)
     {
-        try {
-            $body = $response->getBody();
-            $payload = $body->__toString();
-            if (empty($payload)) {
-                // Nothing to decrypt
-                return $response;
-            }
-
-            $decryptedPayload = $this->decryptPayload($response, $payload);
-
-            // Update body and content length
-            $updatedBody = new PsrStreamInterfaceImpl();
-            $updatedBody->write($decryptedPayload);
-            $response = $response->withBody($updatedBody);
-            self::updateHeader($response, 'Content-Length', $updatedBody->getSize());
-            return $response;
-        } catch (EncryptionException $e) {
-            throw $e;
-        } catch (\Throwable $e) {
-            throw new EncryptionException('Failed to intercept and encrypt request!', $e);
+        // Encrypt fields & update headers
+        if ($this->config->useHttpHeaders()) {
+            // Generate encryption params and add them as HTTP headers
+            $params = FieldLevelEncryptionParams::generate($this->config);
+            self::updateHeader($request, $this->config->getIvHeaderName(), $params->getIvValue());
+            self::updateHeader($request, $this->config->getEncryptedKeyHeaderName(), $params->getEncryptedKeyValue());
+            self::updateHeader($request, $this->config->getEncryptionCertificateFingerprintHeaderName(), $this->config->getEncryptionCertificateFingerprint());
+            self::updateHeader($request, $this->config->getEncryptionKeyFingerprintHeaderName(), $this->config->getEncryptionKeyFingerprint());
+            self::updateHeader($request, $this->config->getOaepPaddingDigestAlgorithmHeaderName(), $params->getOaepPaddingDigestAlgorithmValue());
+            $encryptedPayload = FieldLevelEncryption::encryptPayload($requestPayload, $this->config, $params);
+        } else {
+            // Encryption params will be stored in the payload
+            $encryptedPayload = FieldLevelEncryption::encryptPayload($requestPayload, $this->config);
         }
+
+        return $encryptedPayload;
+    }
+
+    public function decryptPayload(ResponseInterface &$response, $responsePayload)
+    {
+        // Decrypt fields & update headers
+        if ($this->config->useHttpHeaders()) {
+            // Read encryption params from HTTP headers and delete headers
+            $ivValue = self::readAndRemoveHeader($response, $this->config->getIvHeaderName());
+            $encryptedKeyValue = self::readAndRemoveHeader($response, $this->config->getEncryptedKeyHeaderName());
+            $oaepPaddingDigestAlgorithmValue = self::readAndRemoveHeader($response, $this->config->getOaepPaddingDigestAlgorithmHeaderName());
+            self::readAndRemoveHeader($response, $this->config->getEncryptionCertificateFingerprintHeaderName());
+            self::readAndRemoveHeader($response, $this->config->getEncryptionKeyFingerprintHeaderName());
+            $params = new FieldLevelEncryptionParams($this->config, $ivValue, $encryptedKeyValue, $oaepPaddingDigestAlgorithmValue);
+            $decryptedPayload = FieldLevelEncryption::decryptPayload($responsePayload, $this->config, $params);
+        } else {
+            // Encryption params are stored in the payload
+            $decryptedPayload = FieldLevelEncryption::decryptPayload($responsePayload, $this->config);
+        }
+
+        return $decryptedPayload;
     }
 
     /**
      * @param MessageInterface $message
      * @param string           $name
-     * @param string           $value
+     *
+     * @return string|null
      */
-    protected static function updateHeader(&$message, $name, $value)
+    protected static function readAndRemoveHeader(&$message, $name)
     {
         if (empty($name)) {
-            // Do nothing
-            return $message;
+            return null;
         }
-        $message = $message->withHeader($name, $value);
+        if (!$message->hasHeader($name)) {
+            return null;
+        }
+        $values = $message->getHeader($name);
+        $message = $message->withoutHeader($name);
+        return $values[0];
     }
 }
