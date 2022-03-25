@@ -36,7 +36,13 @@ class DecryptionKey  {
         $ret->mAlias = $alias;
         $ret->mPassword = $password;
         try {
-            $ret->mContents = file_get_contents($keyPath);
+            $pkcs12_read_results = [];
+
+            if(openssl_pkcs12_read(file_get_contents($keyPath), $pkcs12_read_results, $password)) {
+                openssl_pkey_export($pkcs12_read_results['pkey'], $ret->mContents, $password);
+            }else{
+                $ret->mContents = file_get_contents($keyPath); 
+            }
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Failed to read the given file: ' . $keyPath . '!', 0, $e);
         }

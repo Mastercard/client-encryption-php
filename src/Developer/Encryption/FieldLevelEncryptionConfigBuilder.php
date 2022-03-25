@@ -54,7 +54,7 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
-     * @param EncryptionKey
+     * @param EncryptionKey $encryptionCertificate
      * @see FieldLevelEncryptionConfig::encryptionCertificate.
      * @return $this
      */
