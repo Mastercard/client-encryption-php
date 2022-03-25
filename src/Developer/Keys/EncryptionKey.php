@@ -2,6 +2,8 @@
 
 namespace Mastercard\Developer\Keys;
 
+use Mastercard\Developer\Utils\EncodingUtils;
+
 class EncryptionKey  {
     /**
      * @var string
@@ -22,6 +24,12 @@ class EncryptionKey  {
         $ret = new EncryptionKey();
         try {
             $ret->mContents = file_get_contents($keyPath);
+            if (strpos($ret->mContents, '-----BEGIN CERTIFICATE-----') === FALSE) {
+                $ret->mContents = EncodingUtils::derToPem($ret->mContents, 
+                    '-----BEGIN CERTIFICATE-----', 
+                    '-----END CERTIFICATE-----'
+                );
+            }
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Failed to read the given file: ' . $keyPath . '!', 0, $e);
         }
