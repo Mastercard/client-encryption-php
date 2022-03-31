@@ -50,7 +50,7 @@ class FieldLevelEncryptionParams {
         $secretKey = AESEncryption::generateCek(self::SYMMETRIC_KEY_SIZE);
 
         // Encrypt the secret key
-        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate()->getBytes(), $secretKey);
+        $encryptedSecretKeyBytes = RSA::wrapSecretKey($config->getEncryptionCertificate()->getBytes(), $secretKey, $config->getOaepPaddingDigestAlgorithm());
         $encryptedKeyValue = EncodingUtils::encodeBytes($encryptedSecretKeyBytes, $config->getFieldValueEncoding());
 
         // Compute the OAEP padding digest algorithm
