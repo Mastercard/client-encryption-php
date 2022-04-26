@@ -16,13 +16,13 @@ jobs:
         include:
           - php: 5.6
             phpunit: 5
-            composerversion: '2.2'
+            composerversion: '2.2.9'
           - php: '7.0'
             phpunit: 6
-            composerversion: '2.2'
+            composerversion: '2.2.9'
           - php: 7.1
             phpunit: 7
-            composerversion: '2.2'
+            composerversion: '2.2.9'
           - php: 7.2
             phpunit: 8
             composerversion: 'latest'
