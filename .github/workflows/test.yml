@@ -16,24 +16,31 @@ jobs:
         include:
           - php: 5.6
             phpunit: 5
-            composerversion: 'v2.2.9'
+            vcomposerversion: 'v2.2.9'
+            composerversion: '2.2.9'
           - php: '7.0'
             phpunit: 6
-            composerversion: 'v2.2.9'
+            vcomposerversion: 'v2.2.9'
+            composerversion: '2.2.9'
           - php: 7.1
             phpunit: 7
-            composerversion: 'v2.2.9'
+            vcomposerversion: 'v2.2.9'
+            composerversion: '2.2.9'
           - php: 7.2
             phpunit: 8
+            vcomposerversion: 'latest'
             composerversion: 'latest'
           - php: 7.3
             phpunit: 9
+            vcomposerversion: 'latest'
             composerversion: 'latest'
           - php: 7.4
             phpunit: 9
+            vcomposerversion: 'latest'
             composerversion: 'latest'
           - php: '8.0'
             phpunit: 9
+            vcomposerversion: 'latest'
             composerversion: 'latest'
 
     runs-on: ubuntu-latest
@@ -46,7 +53,7 @@ jobs:
       with:
         php-version: ${{ matrix.php }}
         coverage: none
-        tools: composer:${{ matrix.composerversion }}
+        tools: composer:${{ matrix.vcomposerversion }}
 
     - name: Cache Composer dependencies
       uses: actions/cache@v2
@@ -58,6 +65,7 @@ jobs:
       uses: php-actions/composer@v5
       with:
         php_version: ${{ matrix.php }}
+        version: ${{ matrix.composerversion }}
 
     - name: Run tests
       uses: php-actions/phpunit@v3
