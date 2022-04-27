@@ -61,7 +61,6 @@ jobs:
       uses: php-actions/composer@v5
       with:
         php_version: ${{ matrix.php }}
-        version: ${{ matrix.composerversion }}
 
     - name: Run tests
       uses: php-actions/phpunit@v3
