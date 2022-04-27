@@ -61,6 +61,10 @@ jobs:
         path: /tmp/composer-cache
         key: php${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
 
+    - name: Downgrading composer
+      run: >
+        composer self-update --2.2
+
     - name: Install dependencies
       uses: php-actions/composer@v6
       with:
