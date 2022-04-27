@@ -16,8 +16,8 @@ jobs:
         include:
           - php: 5.6
             phpunit: 5
-            vcomposerversion: 'latest'
-            composerversion: 'latest'
+            vcomposerversion: 'v2.2.9'
+            composerversion: '2.2.9'
 #          - php: '7.0'
 #            phpunit: 6
 #            vcomposerversion: 'v2.2.9'
@@ -66,7 +66,7 @@ jobs:
         composer self-update --2.2
 
     - name: Install dependencies
-      uses: php-actions/composer@v6
+      uses: php-actions/composer@v5
       with:
         php_version: ${{ matrix.php }}
         version: ${{ matrix.composerversion }}
