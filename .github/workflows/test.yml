@@ -18,14 +18,14 @@ jobs:
 #            phpunit: 5
 #            vcomposerversion: '2.2.9'
 #            composerversion: 'latest'
-          - php: '7.0'
-            phpunit: 6
-            vcomposerversion: '2.2.9'
-            composerversion: 'latest'
-          - php: 7.1
-            phpunit: 7
-            vcomposerversion: '2.2.9'
-            composerversion: 'latest'
+#          - php: '7.0'
+#            phpunit: 6
+#            vcomposerversion: '2.2.9'
+#            composerversion: 'latest'
+#          - php: 7.1
+#            phpunit: 7
+#            vcomposerversion: '2.2.9'
+#            composerversion: 'latest'
           - php: 7.2
             phpunit: 8
             vcomposerversion: '2.2.9'
