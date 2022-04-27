@@ -63,7 +63,7 @@ jobs:
 
     - name: Downgrading composer
       run: >
-        composer self-update --2.2
+        composer self-update --2.2.9
 
     - name: Install dependencies
       uses: php-actions/composer@v5
