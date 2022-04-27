@@ -36,8 +36,8 @@ jobs:
 #            composerversion: 'latest'
           - php: '8.0'
             phpunit: 9
-            vcomposerversion: 'v2.3.5'
-            composerversion: '2.3.5'
+            vcomposerversion: 'latest'
+            composerversion: 'latest'
 
     runs-on: ubuntu-latest
 
