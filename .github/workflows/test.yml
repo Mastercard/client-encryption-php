@@ -16,11 +16,11 @@ jobs:
         include:
           - php: '7.0'
             phpunit: 6
-            vcomposerversion: 'v2.2.9'
+            vcomposerversion: 'v2.2.6'
             composerversion: '2.2.9'
           - php: 7.1
             phpunit: 7
-            vcomposerversion: 'v2.2.9'
+            vcomposerversion: 'v2.2.6'
             composerversion: '2.2.9'
           - php: 7.2
             phpunit: 8
