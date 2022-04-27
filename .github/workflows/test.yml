@@ -49,7 +49,7 @@ jobs:
       with:
         php-version: ${{ matrix.php }}
         coverage: none
-        tools: composer:${{ matrix.vcomposerversion }}
+#        tools: composer:${{ matrix.vcomposerversion }}
 
     - name: Cache Composer dependencies
       uses: actions/cache@v2
@@ -61,7 +61,7 @@ jobs:
       uses: php-actions/composer@v5
       with:
         php_version: ${{ matrix.php }}
-        version: ${{ matrix.composerversion }}
+#        version: ${{ matrix.composerversion }}
 
     - name: Run tests
       uses: php-actions/phpunit@v3
