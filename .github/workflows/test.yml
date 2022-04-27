@@ -14,6 +14,10 @@ jobs:
     strategy:
       matrix:
         include:
+          - php: 5.6
+            phpunit: 5
+            vcomposerversion: 'v2.2.6'
+            composerversion: '2.2.6'
           - php: '7.0'
             phpunit: 6
             vcomposerversion: 'v2.2.6'
@@ -58,13 +62,13 @@ jobs:
         key: php${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
 
     - name: Install dependencies
-      uses: php-actions/composer@v5
+      uses: php-actions/composer@v6
       with:
         php_version: ${{ matrix.php }}
-        version: ${{ matrix.vcomposerversion }}
+        version: ${{ matrix.composerversion }}
 
     - name: Run tests
       uses: php-actions/phpunit@v3
       with:
         php_version: ${{ matrix.php }}
-       version: ${{ matrix.phpunit }}
+        version: ${{ matrix.phpunit }}
