@@ -62,9 +62,11 @@ jobs:
 #        key: php${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
 
     - name: Install dependencies
-      uses: php-actions/composer@v5
+      uses: php-actions/composer@v6
       with:
         php_version: ${{ matrix.php }}
+        version: ${{ matrix.vcomposerversion }}
+
     - name: Run tests
       uses: php-actions/phpunit@v3
       with:
