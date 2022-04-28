@@ -61,11 +61,17 @@ jobs:
 #        path: /tmp/composer-cache
 #        key: php${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
 
+#    - name: Install dependencies
+#      uses: php-actions/composer@v6
+#      with:
+#        php_version: ${{ matrix.php }}
+#        version: ${{ matrix.vcomposerversion }}
+
     - name: Install dependencies
-      uses: php-actions/composer@v6
-      with:
-        php_version: ${{ matrix.php }}
-        version: ${{ matrix.vcomposerversion }}
+      run: |
+        composer --no-plugins --no-scripts install
+        composer --no-plugins --no-scripts dump-autoload -o
+        vendor/bin/phpunit --configuration ./phpunit.xml --teamcity
 
     - name: Run tests
       uses: php-actions/phpunit@v3
