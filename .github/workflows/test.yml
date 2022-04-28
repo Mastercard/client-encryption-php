@@ -16,32 +16,25 @@ jobs:
         include:
           - php: 5.6
             phpunit: 5
-            vcomposerversion: '2.1.9'
+            composerversion: '2.2.9'
+          - php: '7.0'
+            phpunit: 6
+            composerversion: '2.2.9'
+          - php: 7.1
+            phpunit: 7
+            composerversion: '2.2.9'
+          - php: 7.2
+            phpunit: 8
+            composerversion: '2.2.9'
+          - php: 7.3
+            phpunit: 9
             composerversion: 'latest'
-#          - php: '7.0'
-#            phpunit: 6
-#            vcomposerversion: '2.2.9'
-#            composerversion: 'latest'
-#          - php: 7.1
-#            phpunit: 7
-#            vcomposerversion: '2.2.9'
-#            composerversion: 'latest'
-#          - php: 7.2
-#            phpunit: 8
-#            vcomposerversion: '2.2.9'
-#            composerversion: 'latest'
-#          - php: 7.3
-#            phpunit: 9
-#            vcomposerversion: '2.2.9'
-#            composerversion: 'latest'
-#          - php: 7.4
-#            phpunit: 9
-#            vcomposerversion: '2.2.9'
-#            composerversion: 'latest'
-#          - php: '8.0'
-#            phpunit: 9
-#            vcomposerversion: '2.2.9'
-#            composerversion: 'latest'
+          - php: 7.4
+            phpunit: 9
+            composerversion: 'latest'
+          - php: '8.0'
+            phpunit: 9
+            composerversion: 'latest'
 
     runs-on: ubuntu-latest
 
@@ -53,19 +46,13 @@ jobs:
       with:
         php-version: ${{ matrix.php }}
         coverage: none
-        tools: composer:${{ matrix.vcomposerversion }}
+        tools: composer:${{ matrix.composerversion }}
 
-#    - name: Cache Composer dependencies
-#      uses: actions/cache@v2
-#      with:
-#        path: /tmp/composer-cache
-#        key: php${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
-
-#    - name: Install dependencies
-#      uses: php-actions/composer@v6
-#      with:
-#        php_version: ${{ matrix.php }}
-#        version: ${{ matrix.vcomposerversion }}
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: /tmp/composer-cache
+        key: php${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
 
     - name: Install dependencies
       run: |
