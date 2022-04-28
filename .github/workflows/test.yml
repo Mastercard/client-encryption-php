@@ -16,7 +16,7 @@ jobs:
         include:
           - php: 5.6
             phpunit: 5
-            vcomposerversion: 'latest'
+            vcomposerversion: '2.2.9'
             composerversion: 'latest'
 #          - php: '7.0'
 #            phpunit: 6
@@ -66,6 +66,7 @@ jobs:
       with:
         php_version: ${{ matrix.php }}
         version: ${{ matrix.vcomposerversion }}
+        composer_version: ${{ matrix.vcomposerversion }}
 
     - name: Run tests
       uses: php-actions/phpunit@v3
