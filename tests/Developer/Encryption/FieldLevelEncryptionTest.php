@@ -3,71 +3,15 @@
 namespace Mastercard\Developer\Encryption;
 
 use InvalidArgumentException;
+use Mastercard\Developer\Keys\DecryptionKey;
 use Mastercard\Developer\Test\TestUtils;
-use Mastercard\Developer\Utils\EncryptionUtils;
 use Mastercard\Developer\Utils\StringUtils;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 class FieldLevelEncryptionTest extends TestCase {
-
-    public function testConstruct_ShouldBePrivate() {
-        // GIVEN
-        $class = new ReflectionClass(FieldLevelEncryption::class);
-        $constructor = $class->getConstructor();
-
-        // WHEN
-        $isPrivate = $constructor->isPrivate();
-
-        // THEN
-        $this->assertTrue($isPrivate);
-
-        // COVERAGE
-        $constructor->setAccessible(true);
-        $constructor->invoke($class->newInstanceWithoutConstructor());
-    }
-
-    private static function callEncryptBytes($params) {
-        return TestUtils::callPrivateStatic(FieldLevelEncryption::class, 'encryptBytes', $params);
-    }
-
-    private static function callDecryptBytes($params) {
-        return TestUtils::callPrivateStatic(FieldLevelEncryption::class, 'decryptBytes', $params);
-    }
-
     private function assertDecryptedPayloadEquals($expectedPayload, $encryptedPayload, $config) {
         $payloadString = FieldLevelEncryption::decryptPayload($encryptedPayload, $config);
         $this->assertJsonStringEqualsJsonString($expectedPayload, $payloadString);
-    }
-
-    public function testEncryptBytes_InteroperabilityTest() {
-
-        // GIVEN
-        $ivValue = 'VNm/scgd1jhWF0z4+Qh6MA==';
-        $keyValue = 'mZzmzoURXI3Vk0vdsPkcFw==';
-        $dataValue = 'some data ù€@';
-
-        // WHEN
-        $encryptedBytes = self::callEncryptBytes(array(base64_decode($keyValue), base64_decode($ivValue), $dataValue));
-
-        // THEN
-        $expectedEncryptedBytes = base64_decode('Y6X9YneTS4VuPETceBmvclrDoCqYyBgZgJUdnlZ8/0g=');
-        $this->assertEquals($expectedEncryptedBytes, $encryptedBytes);
-    }
-
-    public function testDecryptBytes_InteroperabilityTest() {
-
-        // GIVEN
-        $ivValue = 'VNm/scgd1jhWF0z4+Qh6MA==';
-        $keyValue = 'mZzmzoURXI3Vk0vdsPkcFw==';
-        $encryptedDataValue = 'Y6X9YneTS4VuPETceBmvclrDoCqYyBgZgJUdnlZ8/0g=';
-
-        // WHEN
-        $decryptedBytes = self::callDecryptBytes(array(base64_decode($keyValue), base64_decode($ivValue), base64_decode($encryptedDataValue)));
-
-        // THEN
-        $expectedBytes = 'some data ù€@';
-        $this->assertEquals($expectedBytes, $decryptedBytes);
     }
 
     public function testDecryptPayload_InteroperabilityTest() {
@@ -75,7 +19,7 @@ class FieldLevelEncryptionTest extends TestCase {
         // GIVEN
         $encryptedPayload = '{"data":"WtBPYHL5jdU/BsECYzlyRUPIElWCwSCgKhk5RPy2AMZBGmC8OUJ1L9HC/SF2QpCU+ucZTmo7XOjhSdVi0/yrdZP1OG7dVWcW4MEWpxiU1gl0fS0LKKPOFjEymSP5f5otdTFCp00xPfzp+l6K3S3kZTAuSG1gh6TaRL+qfC1POz8KxhCEL8D1MDvxnlmchPx/hEyAzav0AID3T7T4WomzUXErNrnbDCCiL6pm4IBR8cDAzU4eSmTxdzZFyvTpBQDXVyFdkaNTo3GXk837wujVK8EX3c+gsJvMq4XVJFwGmPNhPM6P7OmdK45cldWrD5j2gO2VBH5aW1EXfot7d11bjJC9T8D/ZOQFF6uLIG7J9x9R0Ts0zXD/H24y9/jF30rKKX7TNmKHn5uh1Czd+h7ryIAqaQsOu6ILBKfH7W/NIR5qYN1GiL/kOYwx2pdIGQdcdolVdxV8Z6bt4Tcvq3jSZaCbhJI/kphZL7QHJgcG6luz9k0457x/0QCDPlve6JNgUQzAOYC64X0a07JpERH0O08/YbntKEq6qf7UhloyI5A="}';
         $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
-            ->withDecryptionKey(EncryptionUtils::loadDecryptionKey('./resources/Keys/Pkcs1/test_key_pkcs1-2048.pem'))
+            ->withDecryptionKey(DecryptionKey::load('./resources/Keys/Pkcs1/test_key_pkcs1-2048.pem'))
             ->withDecryptionPath('$', '$')
             ->withEncryptedValueFieldName('data')
             ->withFieldValueEncoding(FieldValueEncoding::BASE64)
@@ -737,13 +681,15 @@ class FieldLevelEncryptionTest extends TestCase {
         $encryptedPayload = FieldLevelEncryption::encryptPayload($payload, $config);
 
         // THEN
-        error_log($encryptedPayload);
+        // error_log($encryptedPayload);
         $encryptedPayloadObject = json_decode($encryptedPayload);
         $this->assertNotEmpty($encryptedPayloadObject);
         $encryptedValue = $encryptedPayloadObject->encryptedValue;
         $this->assertNotEmpty($encryptedValue);
         $this->assertEquals(6, count((array)$encryptedPayloadObject));
     }
+
+        
 
     public function testDecryptPayload_Nominal() {
 
@@ -1233,7 +1179,7 @@ class FieldLevelEncryptionTest extends TestCase {
             ->withDecryptionPath('encryptedData', 'data')
             ->withOaepPaddingDigestAlgorithm('SHA-256')
             // Not the right key
-            ->withDecryptionKey(EncryptionUtils::loadDecryptionKey('./resources/Keys/Pkcs12/test_key.p12', 'mykeyalias', 'Password1'))
+            ->withDecryptionKey(DecryptionKey::load("./resources/Keys/Pkcs12/test_key.p12", null, 'Password1'))
             ->build();
 
         // THEN

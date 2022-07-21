@@ -1,4 +1,5 @@
 <?php
+
 namespace Mastercard\Developer\Interceptors;
 
 use GuzzleHttp\Psr7\Response;
@@ -8,9 +9,11 @@ use Mastercard\Developer\Utils\StringUtils;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\Request; // GuzzleHttp requests are implementing the PSR RequestInterface
 
-class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
+class PsrHttpMessageEncryptionInterceptorTest extends TestCase
+{
 
-    public function testInterceptRequest_ShouldEncryptRequestPayloadAndUpdateContentLengthHeader() {
+    public function testInterceptRequest_ShouldEncryptRequestPayloadAndUpdateContentLengthHeader()
+    {
 
         // GIVEN
         $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
@@ -33,7 +36,8 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $this->assertEquals(strval(strlen($encryptedPayload)), $request->getHeader('Content-Length')[0]);
     }
 
-    public function testInterceptRequest_ShouldDoNothing_WhenNoPayload() {
+    public function testInterceptRequest_ShouldDoNothing_WhenNoPayload()
+    {
 
         // GIVEN
         $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
@@ -52,7 +56,8 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $this->assertEquals($initialHeaderCount, sizeof($request->getHeaders()));
     }
 
-    public function testInterceptRequest_ShouldThrowEncryptionException_WhenEncryptionFails() {
+    public function testInterceptRequest_ShouldThrowEncryptionException_WhenEncryptionFails()
+    {
 
         // GIVEN
         $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
@@ -72,8 +77,9 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $instanceUnderTest->interceptRequest($request);
     }
 
-    public function testInterceptRequest_ShouldEncryptRequestPayloadAndAddEncryptionHttpHeaders_WhenRequestedInConfig() {
-        
+    public function testInterceptRequest_ShouldEncryptRequestPayloadAndAddEncryptionHttpHeaders_WhenRequestedInConfig()
+    {
+
         // GIVEN
         $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()
             ->withEncryptionPath('$.foo', '$.encryptedFoo')
@@ -109,8 +115,9 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $this->assertEquals('761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79', $request->getHeader('x-encryption-key-fingerprint')[0]);
     }
 
-    public function testInterceptResponse_ShouldDecryptResponsePayloadAndUpdateContentLengthHeader() {
-        
+    public function testInterceptResponse_ShouldDecryptResponsePayloadAndUpdateContentLengthHeader()
+    {
+
         // GIVEN
         $encryptedPayload = '{
             "encryptedData": {
@@ -138,8 +145,9 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $this->assertEquals(strval(strlen($payload)), $response->getHeader('Content-Length')[0]);
     }
 
-    public function testInterceptResponse_ShouldDoNothing_WhenNoPayload() {
-        
+    public function testInterceptResponse_ShouldDoNothing_WhenNoPayload()
+    {
+
         // GIVEN
         $config = TestUtils::getTestFieldLevelEncryptionConfigBuilder()->build();
         $response = new Response(200);
@@ -154,7 +162,8 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $this->assertEquals(0, sizeof($response->getHeaders()));
     }
 
-    public function testInterceptResponse_ShouldThrowEncryptionException_WhenDecryptionFails() {
+    public function testInterceptResponse_ShouldThrowEncryptionException_WhenDecryptionFails()
+    {
 
         // GIVEN
         $encryptedPayload = '{
@@ -179,7 +188,8 @@ class PsrHttpMessageEncryptionInterceptorTest extends TestCase {
         $instanceUnderTest->interceptResponse($response);
     }
 
-    public function testInterceptRequest_ShouldDecryptResponsePayloadAndRemoveEncryptionHttpHeaders_WhenRequestedInConfig() {
+    public function testInterceptRequest_ShouldDecryptResponsePayloadAndRemoveEncryptionHttpHeaders_WhenRequestedInConfig()
+    {
 
         // GIVEN
         $encryptedPayload = '{

@@ -1,7 +1,7 @@
 <?php
 namespace Mastercard\Developer\Utils;
 
-use phpseclib\Crypt\Hash;
+use phpseclib3\Crypt\Hash;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 

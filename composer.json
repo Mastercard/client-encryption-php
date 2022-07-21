@@ -18,12 +18,14 @@
         }
     ],
     "require": {
-        "phpseclib/phpseclib": "^2.0",
-        "symfony/polyfill-php70": "^1.19"
+        "phpseclib/phpseclib": "~3.0",
+        "symfony/polyfill-php70": "^1.19",
+        "galbar/jsonpath": "^2.0"
     },
     "require-dev": {
         "guzzlehttp/guzzle": "^6.2",
-        "yoast/phpunit-polyfills": "^1.0"
+        "yoast/phpunit-polyfills": "^1.0",
+        "phake/phake": "*"
     },
     "suggest": {
         "psr/http-message": "Allow usage of the PsrHttpMessageEncryptionInterceptor class"

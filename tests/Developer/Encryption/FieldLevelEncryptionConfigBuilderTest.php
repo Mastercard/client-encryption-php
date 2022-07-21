@@ -5,6 +5,7 @@ use InvalidArgumentException;
 use Mastercard\Developer\Encryption\EncryptionException;
 use Mastercard\Developer\Encryption\FieldLevelEncryptionConfigBuilder;
 use Mastercard\Developer\Encryption\FieldValueEncoding;
+use Mastercard\Developer\Keys\EncryptionKey;
 use Mastercard\Developer\Test\TestUtils;
 use PHPUnit\Framework\TestCase;
 
@@ -34,7 +35,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
             ->build();
         $this->assertNotEmpty($config);
         $this->assertEquals(1, sizeof($config->getEncryptionPaths()));
-        $this->assertNotEmpty($config->getEncryptionCertificate());
+        $this->assertNotEmpty($config->getEncryptionCertificate()->getBytes());
         $this->assertEquals('97A2FFE9F0D48960EF31E87FCD7A55BF7843FB4A9EEEF01BDB6032AD6FEF146B', $config->getEncryptionCertificateFingerprint());
         $this->assertEquals('F806B26BC4870E26986C70B6590AF87BAF4C2B56BB50622C51B12212DAFF2810', $config->getEncryptionKeyFingerprint());
         $this->assertEquals('publicCertificateFingerprint', $config->getEncryptionCertificateFingerprintFieldName());
@@ -70,7 +71,7 @@ class FieldLevelEncryptionConfigBuilderTest extends TestCase {
         $this->expectExceptionMessage('Failed to compute encryption certificate fingerprint!');
         TestUtils::getTestFieldLevelEncryptionConfigBuilder()
             ->withEncryptionCertificateFingerprint(null)
-            ->withEncryptionCertificate('not a certificate')
+            ->withEncryptionCertificate(EncryptionKey::create('not a certificate'))
             ->build();
     }
 
