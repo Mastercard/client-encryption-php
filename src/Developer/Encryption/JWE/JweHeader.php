@@ -14,7 +14,7 @@ class JweHeader
         $this->alg = $alg;
         $this->enc = $enc;
         $this->kid = $kid;
-        $this->cty = $cty;
+        if(!is_null($cty)) $this->cty = $cty;
     }
 
     public function toJSON()
@@ -34,11 +34,12 @@ class JweHeader
 
         $headerObj = json_decode(base64_decode($encodedHeader), true);
 
+        var_dump($headerObj);
+
         $alg = $headerObj["alg"];
         $enc = $headerObj["enc"];
         $kid = $headerObj["kid"];
-        $cty = $headerObj["cty"];
-
+        $cty = (isset($headerObj["cty"])) ? $headerObj["cty"] : null;
         return new JweHeader($alg, $enc, $kid, $cty);
     }
 

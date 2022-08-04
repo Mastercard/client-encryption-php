@@ -39,7 +39,7 @@ class DecryptionKey  {
             $pkcs12_read_results = [];
 
             if(openssl_pkcs12_read(file_get_contents($keyPath), $pkcs12_read_results, $password)) {
-                openssl_pkey_export($pkcs12_read_results['pkey'], $ret->mContents, $password);
+                $ret->mContents = $pkcs12_read_results['pkey'];
             }else{
                 $ret->mContents = file_get_contents($keyPath); 
             }

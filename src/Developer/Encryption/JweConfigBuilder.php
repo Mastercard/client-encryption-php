@@ -2,6 +2,9 @@
 
 namespace Mastercard\Developer\Encryption;
 
+use Mastercard\Developer\Utils\EncodingUtils;
+use phpseclib3\Crypt\Hash;
+
 class JweConfigBuilder extends EncryptionConfigBuilder {
 
     /**
@@ -20,9 +23,8 @@ class JweConfigBuilder extends EncryptionConfigBuilder {
      */
     public function build() {
         $this->checkParameterValues();
-        $this->computeEncryptionKeyFingerprintWhenNeeded();
+        $this->computeEncryptionKeyFingerprint($this->encryptionCertificate);
         $this->checkJsonPathParameterValues();
-
         $config = new JweConfig();
         $config->setEncryptionCertificate($this->encryptionCertificate);
         $config->setEncryptionKeyFingerprint($this->encryptionKeyFingerprint);
@@ -52,7 +54,7 @@ class JweConfigBuilder extends EncryptionConfigBuilder {
         $this->decryptionKey = $decryptionKey;
         return $this;
     }
-
+    
     /**
      * @param string $jsonPathIn
      * @param string $jsonPathOut
@@ -90,4 +92,20 @@ class JweConfigBuilder extends EncryptionConfigBuilder {
             throw new \InvalidArgumentException("You must include at least an encryption certificate or a decryption key");
         }
     }
+
+    /**
+     * @param mixed $encryptionCertificate
+     * @throws EncryptionException
+     */
+    private function computeEncryptionKeyFingerprint($encryptionCertificate) {
+        try {
+            $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate->getBytes()))['key'];
+            $publicKeyDer = EncodingUtils::pemToDer($publicKeyPem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
+            $hash = new Hash('sha256');
+            $this->encryptionKeyFingerprint = EncodingUtils::encodeBytes($hash->hash($publicKeyDer), FieldValueEncoding::HEX);
+        } catch (\Exception $e) {
+            throw new EncryptionException('Failed to compute encryption key fingerprint!', $e);
+        }
+    }
+
 }
