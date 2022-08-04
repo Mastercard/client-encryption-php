@@ -51,7 +51,7 @@ class JweConfigBuilderTest extends TestCase
             ->withDecryptionKey($decryptionKey)
             ->build();
             
-        $this->assertEquals("80810fc13a8319fcf0e2ec322c82a4c304b782cc3ce671176343cfe8160c2279", $config->getEncryptionKeyFingerprint());
+        $this->assertEquals("761b003c1eade3a5490e5000d37887baa5e6ec0e226c07706e599451fc032a79", $config->getEncryptionKeyFingerprint());
     }
 
     public function testIntercept_ShouldThrowEncryptionException_WhenInvalidEncryptionCertificate() {

@@ -98,13 +98,15 @@ class JweConfigBuilder extends EncryptionConfigBuilder {
      * @throws EncryptionException
      */
     private function computeEncryptionKeyFingerprint($encryptionCertificate) {
-        try {
-            $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate->getBytes()))['key'];
-            $publicKeyDer = EncodingUtils::pemToDer($publicKeyPem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
-            $hash = new Hash('sha256');
-            $this->encryptionKeyFingerprint = EncodingUtils::encodeBytes($hash->hash($publicKeyDer), FieldValueEncoding::HEX);
-        } catch (\Exception $e) {
-            throw new EncryptionException('Failed to compute encryption key fingerprint!', $e);
+        if(isset($encryptionCertificate)) {
+            try {
+                $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate->getBytes()))['key'];
+                $publicKeyDer = EncodingUtils::pemToDer($publicKeyPem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
+                $hash = new Hash('sha256');
+                $this->encryptionKeyFingerprint = EncodingUtils::encodeBytes($hash->hash($publicKeyDer), FieldValueEncoding::HEX);
+            } catch (\Exception $e) {
+                throw new EncryptionException('Failed to compute encryption key fingerprint!', $e);
+            }
         }
     }
 
