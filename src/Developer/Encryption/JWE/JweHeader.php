@@ -34,8 +34,6 @@ class JweHeader
 
         $headerObj = json_decode(base64_decode($encodedHeader), true);
 
-        var_dump($headerObj);
-
         $alg = $headerObj["alg"];
         $enc = $headerObj["enc"];
         $kid = $headerObj["kid"];
