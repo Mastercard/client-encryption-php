@@ -100,7 +100,11 @@ class JweConfigBuilder extends EncryptionConfigBuilder {
     private function computeEncryptionKeyFingerprint($encryptionCertificate) {
         if(isset($encryptionCertificate)) {
             try {
-                $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($encryptionCertificate->getBytes()))['key'];
+                $publicKey = openssl_pkey_get_public($encryptionCertificate->getBytes());
+                if($publicKey == false){
+                    throw new EncryptionException('Invalid encryption cert');
+                }
+                $publicKeyPem = openssl_pkey_get_details($publicKey)['key'];
                 $publicKeyDer = EncodingUtils::pemToDer($publicKeyPem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
                 $hash = new Hash('sha256');
                 $this->encryptionKeyFingerprint = EncodingUtils::encodeBytes($hash->hash($publicKeyDer), FieldValueEncoding::HEX);
