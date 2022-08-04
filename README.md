@@ -17,6 +17,7 @@
   * [Loading the Encryption Certificate](#loading-the-encryption-certificate) 
   * [Loading the Decryption Key](#loading-the-decryption-key)
   * [Performing Field Level Encryption and Decryption](#performing-field-level-encryption-and-decryption)
+  * [Performing JWE Encryption and Decryption](#performing-JWE-encryption-and-decryption)
   * [Integrating with OpenAPI Generator API Client Libraries](#integrating-with-openapi-generator-api-client-libraries)
 
 ## Overview <a name="overview"></a>
@@ -387,6 +388,191 @@ Output:
 }
 ```
 
+### Performing JWE Encryption and Decryption <a name="performing-JWE-encryption-and-decryption"></a>
+
++ [Introduction](#introduction-jwe)
++ [Configuring the JWE Encryption](#configuring-the-JWE-encryption)
++ [Performing Encryption](#performing-encryption-jwe)
++ [Performing Decryption](#performing-decryption-jwe)
++ [Encrypting Entire Payloads](#encrypting-entire-payloads-jwe)
++ [Decrypting Entire Payloads](#decrypting-entire-payloads-jwe)
+
+#### Introduction <a name="introduction-jwe"></a>
+
+The core methods responsible for payload encryption and decryption are `encryptPayload` and `decryptPayload` in the `JWEEncryption` class.
+
+* `encryptPayload` usage:
+```php
+use Mastercard\Developer\Encryption;
+// …
+$encryptedRequestPayload = JWEEncryption::encryptPayload($requestPayload, $config);
+```
+
+* `decryptPayload` usage:
+```php
+use Mastercard\Developer\Encryption;
+// …
+$responsePayload = JWEEncryption::decryptPayload($encryptedResponsePayload, $config);
+```
+
+#### Configuring the JWE Encryption <a name="configuring-the-JWE-encryption"></a>
+Use the `JWEEncryptionConfigBuilder` to create `JWEEncryptionConfig` instances. Example:
+```php
+use Mastercard\Developer\Encryption;
+// …
+$config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
+    ->withEncryptionCertificate($encryptionCertificate)
+    ->withDecryptionKey($decryptionKey)
+    ->withEncryptionPath('$.path.to.foo', '$.path.to.encryptedFoo')
+    ->withDecryptionPath('$.path.to.encryptedFoo', '$.path.to.foo')
+    ->withEncryptedValueFieldName('encryptedValue')
+    ->build();
+```
+Note: If `withEncryptedValueFieldName` is left blank, the value will default to `encryptedData`
+
+See also:
+* [JWEEncryptionConfig.php](https://github.com/Mastercard/client-encryption-php/blob/master/src/Developer/Encryption/JWEEncryptionConfig.php) for all config options
+* [Service Configurations for Client Encryption PHP](https://github.com/Mastercard/client-encryption-php/wiki/Service-Configurations-for-Client-Encryption-PHP)
+
+#### Performing Encryption <a name="performing-encryption-jwe"></a>
+
+Call `JWEEncryption::encryptPayload` with a JSON request payload and a `JWEEncryptionConfig` instance.
+
+Example using the configuration [above](#configuring-the-JWE-encryption):
+```php
+use Mastercard\Developer\Encryption;
+// …
+$payload = '{
+    "path": {
+        "to": {
+            "foo": {
+                "sensitiveField1": "sensitiveValue1",
+                "sensitiveField2": "sensitiveValue2"
+            }
+        }
+    }
+}';
+$encryptedPayload = JWEEncryption::encryptPayload($payload, $config);
+echo (json_encode(json_decode($encryptedPayload), JSON_PRETTY_PRINT));
+```
+
+Output:
+
+```json
+{
+  "path": {
+    "to": {
+      "encryptedFoo": "809a09d78257af5379df0c454dcdf…353ed59fe72fd4a7735c69da4080e74f"
+    }
+  }
+}
+```
+
+#### Performing Decryption <a name="performing-decryption-jwe"></a>
+
+Call `JWEEncryption::decryptPayload` with a JSON response payload and a `JWEEncryptionConfig` instance.
+
+Example using the configuration [above](#configuring-the-JWE-encryption):
+```php
+use Mastercard\Developer\Encryption;
+// …
+$encryptedPayload = '{
+    "path": {
+        "to": {
+            "encryptedFoo": {
+                "encryptedValue": "809a09d78257af5379df0c454dcdf…353ed59fe72fd4a7735c69da4080e74f"
+            }
+        }
+    }
+}';
+$payload = JWEEncryption::decryptPayload($encryptedPayload, $config);
+echo (json_encode(json_decode($payload), JSON_PRETTY_PRINT));
+```
+
+Output:
+```json
+{
+    "path": {
+        "to": {
+            "foo": {
+                "sensitiveField1": "sensitiveValue1",
+                "sensitiveField2": "sensitiveValue2"
+            }
+        }
+    }
+}
+```
+
+#### Encrypting Entire Payloads <a name="encrypting-entire-payloads-jwe"></a>
+
+Entire payloads can be encrypted using the '$' operator as encryption path:
+
+```php
+use Mastercard\Developer\Encryption;
+// …
+$config = JWEConfigBuilder::aFieldLevelEncryptionConfig()
+    ->withEncryptionCertificate(encryptionCertificate)
+    ->withEncryptionPath('$', '$')
+    ->withEncryptedValueFieldName("encryptedValue")
+    // …
+    ->build();
+```
+
+Example:
+```php
+use Mastercard\Developer\Encryption;
+// …
+$payload = '{
+    "sensitiveField1": "sensitiveValue1",
+    "sensitiveField2": "sensitiveValue2"
+}';
+$encryptedPayload = JWEEncryption::encryptPayload($payload, $config);
+echo (json_encode(json_decode($encryptedPayload), JSON_PRETTY_PRINT));
+```
+
+Output:
+```json
+{
+    "encryptedValue": "e5e9340f4d2618d27f8955828c86…379b13901a3b1e2efed616b6750a90fd379515"
+}
+```
+
+#### Decrypting Entire Payloads <a name="decrypting-entire-payloads-jwe"></a>
+
+Entire payloads can be decrypted using the '$' operator as decryption path:
+
+```php
+use Mastercard\Developer\Encryption;
+// …
+$config = JWEEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
+    ->withDecryptionKey(decryptionKey)
+    ->withDecryptionPath('$', '$')
+    ->withEncryptedValueFieldName("encryptedValue")
+    // …
+    ->build();
+```
+
+Example:
+```php
+use Mastercard\Developer\Encryption;
+// …
+$encryptedPayload = '{
+    "encryptedValue": "e5e9340f4d2618d27f8955828c86…379b13901a3b1e2efed616b6750a90fd379515"
+}';
+$payload = FieldLevelEncryption::decryptPayload($encryptedPayload, $config);
+echo (json_encode(json_decode($payload), JSON_PRETTY_PRINT));
+```
+
+Output:
+```json
+{
+    "sensitiveField1": "sensitiveValue1",
+    "sensitiveField2": "sensitiveValue2"
+}
+```
+
+
+
 ### Integrating with OpenAPI Generator API Client Libraries <a name="integrating-with-openapi-generator-api-client-libraries"></a>
 
 [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) generates API client libraries from [OpenAPI Specs](https://github.com/OAI/OpenAPI-Specification). 
@@ -410,7 +596,7 @@ See also:
 * [OpenAPI Generator CLI Installation](https://openapi-generator.tech/docs/installation/)
 * [CONFIG OPTIONS for php](https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/php.md)
 
-##### Usage of the `PsrHttpMessageEncryptionInterceptor`
+##### Usage of the `PsrHttpMessageEncryptionInterceptor` for Field Level Encryption
 
 ```php
 use GuzzleHttp;
@@ -428,6 +614,32 @@ $fieldLevelEncryptionConfig = FieldLevelEncryptionConfigBuilder::aFieldLevelEncr
 $fieldLevelEncryptionInterceptor = new PsrHttpMessageEncryptionInterceptor($fieldLevelEncryptionConfig);
 $stack->push(GuzzleHttp\Middleware::mapRequest([$fieldLevelEncryptionInterceptor, 'interceptRequest']));
 $stack->push(GuzzleHttp\Middleware::mapResponse([$fieldLevelEncryptionInterceptor, 'interceptResponse']));
+$stack->push(GuzzleHttp\Middleware::mapRequest([new PsrHttpMessageSigner($consumerKey, $signingKey), 'sign']));
+$options = ['handler' => $stack];
+$client = new GuzzleHttp\Client($options);
+$config = new Configuration();
+$config->setHost('https://sandbox.api.mastercard.com');
+$serviceApi = new ServiceApi($client, $config);
+// …
+```
+##### Usage of the `PsrHttpMessageEncryptionInterceptor` for JWE Encryption
+
+```php
+use GuzzleHttp;
+use OpenAPI\Client\Api\ServiceApi;
+use OpenAPI\Client\Configuration
+use Mastercard\Developer\Signers\PsrHttpMessageSigner;
+use Mastercard\Developer\Interceptors\PsrHttpMessageEncryptionInterceptor;
+// …
+
+$stack = new GuzzleHttp\HandlerStack();
+$stack->setHandler(new GuzzleHttp\Handler\CurlHandler());
+$jweEncryptionConfig = JWEEncryptionConfigBuilder::aJWEEncryptionConfig()
+    // …
+    ->build();
+$jweEncryptionInterceptor = new PsrHttpMessageEncryptionInterceptor($jweEncryptionConfig);
+$stack->push(GuzzleHttp\Middleware::mapRequest([$jweEncryptionInterceptor, 'interceptRequest']));
+$stack->push(GuzzleHttp\Middleware::mapResponse([$jweEncryptionInterceptor, 'interceptResponse']));
 $stack->push(GuzzleHttp\Middleware::mapRequest([new PsrHttpMessageSigner($consumerKey, $signingKey), 'sign']));
 $options = ['handler' => $stack];
 $client = new GuzzleHttp\Client($options);
