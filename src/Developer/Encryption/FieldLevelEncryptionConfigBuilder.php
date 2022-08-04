@@ -3,10 +3,10 @@
 namespace Mastercard\Developer\Encryption;
 
 use Mastercard\Developer\Json\JsonPath;
+use Mastercard\Developer\Keys\DecryptionKey;
+use Mastercard\Developer\Keys\EncryptionKey;
 use Mastercard\Developer\Utils\EncodingUtils;
-use OpenSSLAsymmetricKey;
-use OpenSSLCertificate;
-use phpseclib\Crypt\Hash;
+use phpseclib3\Crypt\Hash;
 
 /**
  * A builder class for FieldLevelEncryptionConfig.
@@ -19,9 +19,15 @@ class FieldLevelEncryptionConfigBuilder {
         // This class can't be instantiated
     }
 
+    /**
+     * @var EncryptionKey
+     */
     private $encryptionCertificate;
     private $encryptionCertificateFingerprint;
     private $encryptionKeyFingerprint;
+    /**
+     * @var DecryptionKey
+     */
     private $decryptionKey;
     private $encryptionPaths = array();
     private $decryptionPaths = array();
@@ -48,7 +54,7 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
-     * @param OpenSSLCertificate|resource|string $encryptionCertificate
+     * @param EncryptionKey $encryptionCertificate
      * @see FieldLevelEncryptionConfig::encryptionCertificate.
      * @return $this
      */
@@ -78,11 +84,11 @@ class FieldLevelEncryptionConfigBuilder {
     }
 
     /**
-     * @param OpenSSLAsymmetricKey|resource $decryptionKey
+     * @param DecryptionKey $decryptionKey
      * @see FieldLevelEncryptionConfig::decryptionKey.
      * @return $this
      */
-    public function withDecryptionKey($decryptionKey) {
+    public function withDecryptionKey($decryptionKey) {        
         $this->decryptionKey = $decryptionKey;
         return $this;
     }
@@ -356,7 +362,7 @@ class FieldLevelEncryptionConfigBuilder {
             return;
         }
         try {
-            $this->encryptionCertificateFingerprint = openssl_x509_fingerprint($providedEncryptionCertificate, 'sha256');
+            $this->encryptionCertificateFingerprint = openssl_x509_fingerprint($providedEncryptionCertificate->getBytes(), 'sha256');
         } catch (\Exception $e) {
             throw new EncryptionException('Failed to compute encryption certificate fingerprint!', $e);
         }
@@ -372,7 +378,7 @@ class FieldLevelEncryptionConfigBuilder {
             return;
         }
         try {
-            $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($providedEncryptionCertificate))['key'];
+            $publicKeyPem = openssl_pkey_get_details(openssl_pkey_get_public($providedEncryptionCertificate->getBytes()))['key'];
             $publicKeyDer = EncodingUtils::pemToDer($publicKeyPem, '-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----');
             $hash = new Hash('sha256');
             $this->encryptionKeyFingerprint = EncodingUtils::encodeBytes($hash->hash($publicKeyDer), FieldValueEncoding::HEX);

@@ -2,8 +2,8 @@
 
 namespace Mastercard\Developer\Encryption;
 
-use OpenSSLAsymmetricKey;
-use OpenSSLCertificate;
+use Mastercard\Developer\Keys\DecryptionKey;
+use Mastercard\Developer\Keys\EncryptionKey;
 
 /**
  * A class for storing the encryption/decryption configuration.
@@ -13,7 +13,7 @@ class FieldLevelEncryptionConfig {
 
     /**
      * A certificate object whose public key will be used for encryption.
-     * @var OpenSSLCertificate|resource|string
+     * @var EncryptionKey
      */
     private $encryptionCertificate;
 
@@ -34,10 +34,11 @@ class FieldLevelEncryptionConfig {
     private $encryptionKeyFingerprint;
 
     /**
-     * A private key object to be used for decryption.
-     * @var OpenSSLAsymmetricKey|resource
+     * A private key string to be used for decryption.
+     * @var DecryptionKey
      */
     private $decryptionKey;
+
 
     /**
      * A list of JSON paths to encrypt in request payloads.
@@ -165,10 +166,10 @@ class FieldLevelEncryptionConfig {
     /**
      * FieldLevelEncryptionConfig constructor.
      *
-     * @param OpenSSLCertificate|resource|string $encryptionCertificate
+     * @param EncryptionKey                      $encryptionCertificate
      * @param string                             $encryptionCertificateFingerprint
      * @param string                             $encryptionKeyFingerprint
-     * @param OpenSSLAsymmetricKey|resource      $decryptionKey
+     * @param DecryptionKey                      $decryptionKey
      * @param array                              $encryptionPaths
      * @param array                              $decryptionPaths
      * @param string                             $oaepPaddingDigestAlgorithm
@@ -208,7 +209,7 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return OpenSSLCertificate|resource|string
+     * @return EncryptionKey
      */
     public function getEncryptionCertificate() {
         return $this->encryptionCertificate;
@@ -229,7 +230,7 @@ class FieldLevelEncryptionConfig {
     }
 
     /**
-     * @return OpenSSLAsymmetricKey|resource
+     * @return DecryptionKey
      */
     public function getDecryptionKey() {
         return $this->decryptionKey;
