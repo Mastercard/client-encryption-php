@@ -431,7 +431,7 @@ $config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
 Note: If `withEncryptedValueFieldName` is left blank, the value will default to `encryptedData`
 
 See also:
-* [JWEEncryptionConfig.php](https://github.com/Mastercard/client-encryption-php/blob/master/src/Developer/Encryption/JWEEncryptionConfig.php) for all config options
+* [JweConfig.php](https://github.com/Mastercard/client-encryption-php/blob/main/src/Developer/Encryption/JweConfig.php) for all config options
 * [Service Configurations for Client Encryption PHP](https://github.com/Mastercard/client-encryption-php/wiki/Service-Configurations-for-Client-Encryption-PHP)
 
 #### Performing Encryption <a name="performing-encryption-jwe"></a>
