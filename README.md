@@ -399,28 +399,28 @@ Output:
 
 #### Introduction <a name="introduction-jwe"></a>
 
-The core methods responsible for payload encryption and decryption are `encryptPayload` and `decryptPayload` in the `JWEEncryption` class.
+The core methods responsible for payload encryption and decryption are `encryptPayload` and `decryptPayload` in the `JweEncryption` class.
 
 * `encryptPayload` usage:
 ```php
 use Mastercard\Developer\Encryption;
 // …
-$encryptedRequestPayload = JWEEncryption::encryptPayload($requestPayload, $config);
+$encryptedRequestPayload = JweEncryption::encryptPayload($requestPayload, $config);
 ```
 
 * `decryptPayload` usage:
 ```php
 use Mastercard\Developer\Encryption;
 // …
-$responsePayload = JWEEncryption::decryptPayload($encryptedResponsePayload, $config);
+$responsePayload = JweEncryption::decryptPayload($encryptedResponsePayload, $config);
 ```
 
 #### Configuring the JWE Encryption <a name="configuring-the-JWE-encryption"></a>
-Use the `JWEEncryptionConfigBuilder` to create `JWEEncryptionConfig` instances. Example:
+Use the `JweEncryptionConfigBuilder` to create `JweEncryptionConfig` instances. Example:
 ```php
 use Mastercard\Developer\Encryption;
 // …
-$config = FieldLevelEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
+$config = JweEncryptionConfigBuilder::aJweEncryptionConfig()
     ->withEncryptionCertificate($encryptionCertificate)
     ->withDecryptionKey($decryptionKey)
     ->withEncryptionPath('$.path.to.foo', '$.path.to.encryptedFoo')
@@ -436,7 +436,7 @@ See also:
 
 #### Performing Encryption <a name="performing-encryption-jwe"></a>
 
-Call `JWEEncryption::encryptPayload` with a JSON request payload and a `JWEEncryptionConfig` instance.
+Call `JweEncryption::encryptPayload` with a JSON request payload and a `JweEncryptionConfig` instance.
 
 Example using the configuration [above](#configuring-the-JWE-encryption):
 ```php
@@ -452,7 +452,7 @@ $payload = '{
         }
     }
 }';
-$encryptedPayload = JWEEncryption::encryptPayload($payload, $config);
+$encryptedPayload = JweEncryption::encryptPayload($payload, $config);
 echo (json_encode(json_decode($encryptedPayload), JSON_PRETTY_PRINT));
 ```
 
@@ -470,7 +470,7 @@ Output:
 
 #### Performing Decryption <a name="performing-decryption-jwe"></a>
 
-Call `JWEEncryption::decryptPayload` with a JSON response payload and a `JWEEncryptionConfig` instance.
+Call `JweEncryption::decryptPayload` with a JSON response payload and a `JweEncryptionConfig` instance.
 
 Example using the configuration [above](#configuring-the-JWE-encryption):
 ```php
@@ -485,7 +485,7 @@ $encryptedPayload = '{
         }
     }
 }';
-$payload = JWEEncryption::decryptPayload($encryptedPayload, $config);
+$payload = JweEncryption::decryptPayload($encryptedPayload, $config);
 echo (json_encode(json_decode($payload), JSON_PRETTY_PRINT));
 ```
 
@@ -510,7 +510,7 @@ Entire payloads can be encrypted using the '$' operator as encryption path:
 ```php
 use Mastercard\Developer\Encryption;
 // …
-$config = JWEConfigBuilder::aFieldLevelEncryptionConfig()
+$config = JweConfigBuilder::aJweEncryptionConfig()
     ->withEncryptionCertificate(encryptionCertificate)
     ->withEncryptionPath('$', '$')
     ->withEncryptedValueFieldName("encryptedValue")
@@ -526,7 +526,7 @@ $payload = '{
     "sensitiveField1": "sensitiveValue1",
     "sensitiveField2": "sensitiveValue2"
 }';
-$encryptedPayload = JWEEncryption::encryptPayload($payload, $config);
+$encryptedPayload = JweEncryption::encryptPayload($payload, $config);
 echo (json_encode(json_decode($encryptedPayload), JSON_PRETTY_PRINT));
 ```
 
@@ -544,7 +544,7 @@ Entire payloads can be decrypted using the '$' operator as decryption path:
 ```php
 use Mastercard\Developer\Encryption;
 // …
-$config = JWEEncryptionConfigBuilder::aFieldLevelEncryptionConfig()
+$config = JweEncryptionConfigBuilder::aJweEncryptionConfig()
     ->withDecryptionKey(decryptionKey)
     ->withDecryptionPath('$', '$')
     ->withEncryptedValueFieldName("encryptedValue")
@@ -634,12 +634,12 @@ use Mastercard\Developer\Interceptors\PsrHttpMessageEncryptionInterceptor;
 
 $stack = new GuzzleHttp\HandlerStack();
 $stack->setHandler(new GuzzleHttp\Handler\CurlHandler());
-$jweEncryptionConfig = JWEEncryptionConfigBuilder::aJWEEncryptionConfig()
+$JweEncryptionConfig = JweEncryptionConfigBuilder::aJweEncryptionConfig()
     // …
     ->build();
-$jweEncryptionInterceptor = new PsrHttpMessageEncryptionInterceptor($jweEncryptionConfig);
-$stack->push(GuzzleHttp\Middleware::mapRequest([$jweEncryptionInterceptor, 'interceptRequest']));
-$stack->push(GuzzleHttp\Middleware::mapResponse([$jweEncryptionInterceptor, 'interceptResponse']));
+$JweEncryptionInterceptor = new PsrHttpMessageEncryptionInterceptor($JweEncryptionConfig);
+$stack->push(GuzzleHttp\Middleware::mapRequest([$JweEncryptionInterceptor, 'interceptRequest']));
+$stack->push(GuzzleHttp\Middleware::mapResponse([$JweEncryptionInterceptor, 'interceptResponse']));
 $stack->push(GuzzleHttp\Middleware::mapRequest([new PsrHttpMessageSigner($consumerKey, $signingKey), 'sign']));
 $options = ['handler' => $stack];
 $client = new GuzzleHttp\Client($options);
