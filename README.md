@@ -24,7 +24,7 @@
 Library for Mastercard API compliant payload encryption/decryption.
 
 ### Compatibility <a name="compatibility"></a>
-PHP 5.6+
+PHP 7.0+
 
 ### References <a name="references"></a>
 <img src="https://user-images.githubusercontent.com/3964455/55345820-c520a280-54a8-11e9-8235-407199fa1d97.png" alt="Encryption of sensitive data" width="75%" height="75%"/>
