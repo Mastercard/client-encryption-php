@@ -81,6 +81,22 @@ class JweObject
                     $this->getRawHeader(),
                     EncodingUtils::base64UrlDecode($this->getCipherText())
                 );
+            case "A128GCM":
+                return AESGCM::decrypt(
+                    EncodingUtils::base64UrlDecode($this->getIv()),
+                    $cek,
+                    EncodingUtils::base64UrlDecode($this->getAuthTag()),
+                    $this->getRawHeader(),
+                    EncodingUtils::base64UrlDecode($this->getCipherText())
+                );
+            case "A192GCM":
+                return AESGCM::decrypt(
+                    EncodingUtils::base64UrlDecode($this->getIv()),
+                    $cek,
+                    EncodingUtils::base64UrlDecode($this->getAuthTag()),
+                    $this->getRawHeader(),
+                    EncodingUtils::base64UrlDecode($this->getCipherText())
+                );
             case "A128CBC-HS256":
                 return AESCBC::decrypt(
                     EncodingUtils::base64UrlDecode($this->getIv()),
