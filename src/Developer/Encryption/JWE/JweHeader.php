@@ -13,7 +13,7 @@ class JweHeader
     {
         $this->alg = $alg;
         $this->enc = $enc;
-        $this->kid = $kid;
+        if(!is_null($kid)) $this->kid = $kid;
         if(!is_null($cty)) $this->cty = $cty;
     }
 
@@ -36,7 +36,7 @@ class JweHeader
 
         $alg = $headerObj["alg"];
         $enc = $headerObj["enc"];
-        $kid = $headerObj["kid"];
+        $kid = (isset($headerObj["kid"])) ? $headerObj["kid"] : null;
         $cty = (isset($headerObj["cty"])) ? $headerObj["cty"] : null;
         return new JweHeader($alg, $enc, $kid, $cty);
     }
