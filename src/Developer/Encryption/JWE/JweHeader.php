@@ -25,10 +25,18 @@ class JweHeader
     {
         $obj = [];
 
-        if (isset($this->kid)) $obj["kid"] = $this->kid;
-        if (isset($this->alg)) $obj["alg"] = $this->alg;
-        if (isset($this->enc)) $obj["enc"] = $this->enc;
-        if (isset($this->cty)) $obj["cty"] = $this->cty;
+        if (isset($this->kid)) {
+            $obj["kid"] = $this->kid;
+        }
+        if (isset($this->alg)) {
+            $obj["alg"] = $this->alg;
+        }    
+        if (isset($this->enc)) {
+            $obj["enc"] = $this->enc;
+        }
+        if (isset($this->cty)) {
+            $obj["cty"] = $this->cty;
+        }
 
         return json_encode($obj);
     }
