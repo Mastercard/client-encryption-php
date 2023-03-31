@@ -13,8 +13,12 @@ class JweHeader
     {
         $this->alg = $alg;
         $this->enc = $enc;
-        if(!is_null($kid)) $this->kid = $kid;
-        if(!is_null($cty)) $this->cty = $cty;
+        if (!is_null($kid)) {
+            $this->kid = $kid;
+        }
+        if (!is_null($cty)) {
+            $this->cty = $cty;
+        }
     }
 
     public function toJSON()
