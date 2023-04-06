@@ -71,40 +71,23 @@ class JweObject
     {
         $cek = RSA::unwrapSecretKey($config->getDecryptionKey()->getBytes(), EncodingUtils::base64UrlDecode($this->getEncryptedKey()));
         $encryptionMethod = $this->header->getEnc();
-
-        switch ($encryptionMethod) {
-            case "A256GCM":
-                return AESGCM::decrypt(
-                    EncodingUtils::base64UrlDecode($this->getIv()),
-                    $cek,
-                    EncodingUtils::base64UrlDecode($this->getAuthTag()),
-                    $this->getRawHeader(),
-                    EncodingUtils::base64UrlDecode($this->getCipherText())
-                );
-            case "A128GCM":
-                return AESGCM::decrypt(
-                    EncodingUtils::base64UrlDecode($this->getIv()),
-                    $cek,
-                    EncodingUtils::base64UrlDecode($this->getAuthTag()),
-                    $this->getRawHeader(),
-                    EncodingUtils::base64UrlDecode($this->getCipherText())
-                );
-            case "A192GCM":
-                return AESGCM::decrypt(
-                    EncodingUtils::base64UrlDecode($this->getIv()),
-                    $cek,
-                    EncodingUtils::base64UrlDecode($this->getAuthTag()),
-                    $this->getRawHeader(),
-                    EncodingUtils::base64UrlDecode($this->getCipherText())
-                );
-            case "A128CBC-HS256":
-                return AESCBC::decrypt(
-                    EncodingUtils::base64UrlDecode($this->getIv()),
-                    substr($cek, 16, 16),
-                    EncodingUtils::base64UrlDecode($this->getCipherText())
-                );
-            default:
-                throw new EncryptionException(sprintf("Encryption method %s not supported", $encryptionMethod));
+        
+        if ($encryptionMethod == "A256GCM" || $encryptionMethod == "A128GCM" || $encryptionMethod == "A192GCM") {
+            return AESGCM::decrypt(
+                EncodingUtils::base64UrlDecode($this->getIv()),
+                $cek,
+                EncodingUtils::base64UrlDecode($this->getAuthTag()),
+                $this->getRawHeader(),
+                EncodingUtils::base64UrlDecode($this->getCipherText())
+            );
+        } elseif ($encryptionMethod == "A128CBC-HS256") {
+            return AESCBC::decrypt(
+                EncodingUtils::base64UrlDecode($this->getIv()),
+                substr($cek, 16, 16),
+                EncodingUtils::base64UrlDecode($this->getCipherText())
+            );
+        } else {
+            throw new EncryptionException(sprintf("Encryption method %s not supported", $encryptionMethod));
         }
     }
 
