@@ -1,7 +1,7 @@
 # client-encryption-php
 [![](https://developer.mastercard.com/_/_/src/global/assets/svg/mcdev-logo-dark.svg)](https://developer.mastercard.com/)
 
-[![maintenance-status](https://img.shields.io/badge/maintenance-deprecated-red.svg)](https://github.com/Mastercard/.github)
+[![maintenance-status](https://img.shields.io/badge/maintenance-deprecated-red.svg)](https://github.com/Mastercard/.github/blob/main/profile/README.md#deprecation)
 [![](https://github.com/Mastercard/client-encryption-php/workflows/Build%20&%20Test/badge.svg)](https://github.com/Mastercard/client-encryption-php/actions?query=workflow%3A%22Build+%26+Test%22)
 [![](https://sonarcloud.io/api/project_badges/measure?project=Mastercard_client-encryption-php&metric=alert_status)](https://sonarcloud.io/dashboard?id=Mastercard_client-encryption-php)
 [![](https://github.com/Mastercard/client-encryption-php/workflows/broken%20links%3F/badge.svg)](https://github.com/Mastercard/client-encryption-php/actions?query=workflow%3A%22broken+links%3F%22)
