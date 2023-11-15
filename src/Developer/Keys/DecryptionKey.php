@@ -32,7 +32,6 @@ class DecryptionKey  {
     */
     public static function load($keyPath, $alias = null, $password = null){
         $ret = new DecryptionKey();
-        $ret->mPath = $keyPath;
         $ret->mAlias = $alias;
         $ret->mPassword = $password;
         try {
