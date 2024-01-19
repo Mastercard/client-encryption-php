@@ -12,6 +12,7 @@
 - [Overview](#overview)
   * [Compatibility](#compatibility)
   * [References](#references)
+  * [Versioning and Deprecation Policy](#versioning)
 - [Usage](#usage)
   * [Prerequisites](#prerequisites)
   * [Adding the Library to Your Project](#adding-the-library-to-your-project)
@@ -29,6 +30,9 @@ PHP 7.0+
 
 ### References <a name="references"></a>
 <img src="https://user-images.githubusercontent.com/3964455/55345820-c520a280-54a8-11e9-8235-407199fa1d97.png" alt="Encryption of sensitive data" width="75%" height="75%"/>
+
+### Versioning and Deprecation Policy <a name="versioning"></a>
+* [Mastercard Versioning and Deprecation Policy](https://github.com/Mastercard/.github/blob/main/CLIENT_LIBRARY_DEPRECATION_POLICY.md)
 
 ## Usage <a name="usage"></a>
 ### Prerequisites <a name="prerequisites"></a>
